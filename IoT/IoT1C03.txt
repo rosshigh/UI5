@@ -1,0 +1,308 @@
+-- Listing 1
+
+    {
+      "path": "/destinations/iotbuiltin",
+      "target": {
+        "type": "destination",
+        "name": "iotbuiltin"
+      },
+      "description": "IoT Services"
+    }
+
+
+-- Listing 2
+
+<mvc:View controllerName="Climate_Dashboard.controller.View1" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m" xmlns:viz="sap.viz.ui5.controls">
+	<App>
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<HBox>
+						<StandardTile id="tempTile" icon="sap-icon://temperature" title="Temperature" number="{/d/results/0/C_TEMPERATURE}"/>
+						<StandardTile id="humTile" icon="sap-icon://weather-proofing" title="Humidity" number="{/d/results/0/C_HUMIDITY}"/>
+					</HBox>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
+
+
+-- Listing 3
+
+sap.ui.define([
+	"sap/ui/core/mvc/Controller",
+	"sap/ui/model/json/JSONModel"
+], function(Controller, JSONModel) {
+	"use strict";
+
+	return Controller.extend("Climate_Dashboard.controller.View1", {
+		onInit: function() {
+
+			this.oModel = new sap.ui.model.json.JSONModel();
+			this.oModel.loadData(
+				'/destinations/iotbuiltin/NEO_CT4FMF3FDW02NYG4UIPXV81BX.T_IOT_791B24BD6A2202BA3187?$format=json&$top=10&orderby=C_TIMESTAMP%20desc'
+			);
+	
+			this.getView().setModel(this.oModel);
+
+		}
+
+	});
+
+});
+
+
+-- Listing 4
+
+<StandardTile id="tempTile" icon="sap-icon://temperature" title="Temperature" number="{path: '/d/results/0/C_TEMPERATURE', formatter: '.degrees'}"/>
+<StandardTile id="humTile" icon="sap-icon://weather-proofing" title="Humidity" number="{path: '/d/results/0/C_HUMIDITY', formatter: '.humidity'}"/>
+
+
+-- Listing 5
+
+sap.ui.define([
+	"sap/ui/core/mvc/Controller",
+	"sap/ui/model/json/JSONModel"
+], function(Controller, JSONModel) {
+	"use strict";
+
+	return Controller.extend("Climate_Dashboard.controller.View1", {
+		onInit: function() {
+
+			this.oModel = new sap.ui.model.json.JSONModel();
+			this.oModel.loadData(
+				'/destinations/iotbuiltin/NEO_CT4FMF3FDW02NYG4UIPXV81BX.T_IOT_791B24BD6A2202BA3187?$format=json&$top=10&orderby=C_TIMESTAMP%20desc'
+			);
+	
+			this.getView().setModel(this.oModel);
+
+		},
+
+    
+                         degrees: function(temp){
+		     return Math.round(temp) + "\u00b0";
+                         },
+    
+                         humidity: function(hum){
+                             return Math.round(hum)+ "\u0025";;
+                          }
+
+
+	});
+
+});
+
+
+-- Listing 6
+
+<mvc:View controllerName="Climate_Dashboard.controller.View1" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m" xmlns:viz="sap.viz.ui5.controls">
+	<App>
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<HBox>
+						<StandardTile id="tempTile" icon="sap-icon://temperature" title="Temperature" number="{path: '/d/results/0/C_TEMPERATURE', formatter: '.degrees'}"/>
+						<StandardTile id="humTile" icon="sap-icon://weather-proofing" title="Humidity" number="{path: '/d/results/0/C_HUMIDITY', formatter: '.humidity'}"/>
+					</HBox>
+					<ToggleButton id="refreshButtonID" text="Refresh Data" pressed="true" press="doIt"/>
+					<HBox>
+						<viz:Popover id="idPopOver"/>
+						<viz:VizFrame id="idVizFrameLine" height="700px" width="900px" vizType="line" uiConfig="{applicationSet:'fiori'}"></viz:VizFrame>
+					</HBox>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
+
+
+-- Listing 7
+
+var oVizFrame = this.getView().byId("idVizFrameLine");
+			var oPopOver = this.getView().byId("idPopOver");
+
+			var oDataset = new sap.viz.ui5.data.FlattenedDataset({
+				dimensions: [{
+					name: 'ID',
+					value: "{C_TIMESTAMP}"
+				}],
+				measures: [{
+					name: 'Temperature',
+					value: '{C_TEMPERATURE}'
+				}, {
+					name: 'Humidity',
+					value: '{C_HUMIDITY}'
+				}],
+				data: {
+					path: "/d/results"
+				}
+			});
+
+			oVizFrame.setVizProperties({
+				plotArea: {
+					isFixedDataPointSize: true,
+					categorySize: {
+						desktop: {
+							minValue: 100
+						}
+					},
+					dataLabel: {
+						visible: true
+					},
+
+					lineStyle: {
+						rules: [{
+							dataContext: [{
+								ID: "*"
+							}],
+							properties: {
+								width: 6
+							}
+						}]
+					}
+				},
+				legend: {
+					title: {
+						visible: false
+					}
+				},
+
+				title: {
+					visible: true,
+					text: 'Line'
+				}
+			});
+			oVizFrame.setDataset(oDataset);
+			oVizFrame.setModel(this.oModel);
+
+			var feedPrimaryValues = new sap.viz.ui5.controls.common.feeds.FeedItem({
+					'uid': "primaryValues",
+					'type': "Measure",
+					'values': ["Temperature", "Humidity"]
+				}),
+				feedAxisLabels = new sap.viz.ui5.controls.common.feeds.FeedItem({
+					'uid': "axisLabels",
+					'type': "Dimension",
+					'values': ["ID"]
+				});
+
+			oVizFrame.addFeed(feedPrimaryValues);
+			oVizFrame.addFeed(feedAxisLabels);
+			oPopOver.connect(oVizFrame.getVizUid());
+
+
+-- Listing 8
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller",
+   "sap/m/MessageToast",
+   "sap/ui/model/json/JSONModel"
+], function (Controller, MessageToast, JSONModel) {
+   "use strict";
+   return Controller.extend("iot.controller.App", {
+      onInit : function () {
+
+        this.cModel = new sap.ui.model.json.JSONModel();
+		this.cModel.loadData("http://hd3.hana.ucc.uwm.edu:8003/GBI_600/iot/iot.xsodata/DATA?$top=10&$format=json&$orderby=ID desc");
+		this.getView().setModel(this.cModel, "iot");
+		
+		var oVizFrame = this.getView().byId("idVizFrameLine");
+		var oPopOver = this.getView().byId("idPopOver");
+		
+		var oDataset = new sap.viz.ui5.data.FlattenedDataset({
+			dimensions : [ {
+				name : 'ID',
+				value : "{ID}"
+			} ],
+			measures : [
+			{
+				name : 'Temperature',
+				value : '{TEMPERATURE}'
+			}, {
+				name : 'Humidity',
+				value : '{HUMIDITY}'
+			}],
+			data : {
+				path : "/d/results"
+			}
+		});
+	
+		oVizFrame.setVizProperties({
+			plotArea : {
+				isFixedDataPointSize : true,
+				categorySize : {
+				   desktop : {
+					   minValue : 100
+				   }
+				},
+				dataLabel : {visible : true},
+				
+			    lineStyle: {
+			       rules: [
+			          {
+			             dataContext: [
+			                {ID: "*"}
+			             ],
+			             properties: {
+			                 width: 6
+			             }
+			           }]
+			        }
+			     },
+				legend : {
+					title: {visible : false}
+				},
+				
+		        title: {
+		            visible: true,
+		            text: 'Line'
+			     }
+		});
+		oVizFrame.setDataset(oDataset);
+		oVizFrame.setModel(this.cModel);
+
+		var feedPrimaryValues = new sap.viz.ui5.controls.common.feeds.FeedItem({
+			'uid' : "primaryValues",
+			'type' : "Measure",
+			'values' : ["Temperature", "Humidity"]
+		}), feedAxisLabels = new sap.viz.ui5.controls.common.feeds.FeedItem({
+			'uid' : "axisLabels",
+			'type' : "Dimension",
+			'values' : ["ID"]
+		});
+
+		oVizFrame.addFeed(feedPrimaryValues);
+		oVizFrame.addFeed(feedAxisLabels);
+		oPopOver.connect(oVizFrame.getVizUid());
+		
+		var that = this;
+		this.refresh = true;
+		setInterval(function(){ 
+		    if(that.refresh){
+		      that.loadData();  
+		    }  
+		}, 3000);
+      },
+      
+     loadData: function(){
+        this.cModel.loadData('/destinations/iotbuiltin/NEO_CT4FMF3FDW02NYG4UIPXV81BX.T_IOT_791B24BD6A2202BA3187?$format=json&$top=10&orderby=C_TIMESTAMP%20desc');
+    
+    },
+
+   
+    doIt: function(){
+      this.refresh = !this.refresh;  
+    },
+    
+    degrees: function(temp){
+		return Math.round(temp) + "\u00b0";
+    },
+    
+    humidity: function(hum){
+        return Math.round(hum)+ "\u0025";;
+    }
+   });
+});

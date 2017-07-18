@@ -1,0 +1,415 @@
+-- Listing 1
+
+sap.ui.define([
+   "sap/ui/core/UIComponent"
+], function (UIComponent) {
+   "use strict";
+   return UIComponent.extend("", {
+
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+	}
+   });
+});
+
+
+-- Listing 2
+
+sap.ui.define([
+   "sap/ui/core/UIComponent",
+   "sap/ui/model/json/JSONModel",
+   "sap/ui/model/resource/ResourceModel"
+], function (UIComponent, JSONModel, ResourceModel) {
+   "use strict";
+   return UIComponent.extend("ui5.Component", {
+            metadata : {
+		rootView: "ui5.view.App"
+	},
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+         // set data model
+         var oData = {
+            recipient : {
+               name : "World"
+            }
+         };
+         var oModel = new JSONModel(oData);
+         this.setModel(oModel);
+
+         // set i18n model
+         var i18nModel = new ResourceModel({
+            bundleName : "ui5.i18n.i18n"
+         });
+         this.setModel(i18nModel, "i18n");
+      }
+   });
+});
+
+
+-- Listing 3
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller",
+   "sap/m/MessageToast"
+], function (Controller, MessageToast) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+      onShowHello : function () {
+         // read msg from i18n model
+         var oBundle = this.getView().getModel("i18n").getResourceBundle();
+         var sRecipient = this.getView().getModel().getProperty("/recipient/name");
+         var sMsg = oBundle.getText("helloMsg", [sRecipient]);
+         // show message
+         MessageToast.show(sMsg);
+      }
+   });
+});
+
+
+-- Listing 4
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Walkthrough</title>
+      <script
+         id="sap-ui-bootstrap"
+         src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js"
+         data-sap-ui-theme="sap_bluecrystal"
+         data-sap-ui-libs="sap.m"
+         data-sap-ui-bindingSyntax="complex"
+         data-sap-ui-compatVersion="edge"
+         data-sap-ui-preload="async"
+         data-sap-ui-resourceroots='{
+            "ui5": "./"
+         }' >
+      </script>
+      <script>
+         sap.ui.getCore().attachInit(function () {
+            new sap.ui.core.ComponentContainer({
+               name : "ui5"
+            }).placeAt("content");
+         });
+      </script>
+   </head>
+   <body class="sapUiBody" id="content">
+   </body>
+</html>
+
+
+-- Listing 5
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+	"_version": "1.1.0",
+	"id": "sap.ui.demo.wt",
+	"type": "application",
+	"i18n": "i18n/i18n.properties",
+	"title": "{{appTitle}}",
+	"description": "{{appDescription}}",
+	"applicationVersion": {
+	  "version": "1.0.0"
+	}
+  },
+  "sap.ui": {
+	"_version": "1.1.0",
+	"technology": "UI5",
+	"deviceTypes": {
+	  "desktop": true,
+	  "tablet": true,
+	  "phone": true
+	},
+	"supportedThemes": [
+	  "sap_bluecrystal"
+	]
+  },
+  "sap.ui5": {
+	"_version": "1.1.0",
+	"rootView": "ui5.view.App",
+	"dependencies": {
+	  "minUI5Version": "1.30",
+	  "libs": {
+		"sap.m": {}
+	  }
+	},
+	"models": {
+	  "i18n": {
+		"type": "sap.ui.model.resource.ResourceModel",
+		"settings": {
+		  "bundleName": "ui5.i18n.i18n"
+		}
+	  }
+	}
+  }
+}
+
+
+-- Listing 6
+
+# App Descriptor
+appTitle=Hello World
+appDescription=A simple walkthrough app that explains the most important concepts of SAPUI5
+
+# Hello Panel
+showHelloButtonText=Say Hello
+helloMsg=Hello {0}
+
+
+-- Listing 7
+
+sap.ui.define([
+   "sap/ui/core/UIComponent",
+   "sap/ui/model/json/JSONModel"
+], function (UIComponent, JSONModel) {
+   "use strict";
+   return UIComponent.extend("ui5.Component", {
+      metadata : {
+            manifest: "json"
+      },
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+         // set data model
+         var oData = {
+            recipient : {
+               name : "World"
+            }
+         };
+         var oModel = new JSONModel(oData);
+         this.setModel(oModel);
+      }
+   });
+});
+
+
+-- Listing 8
+
+
+<mvc:View
+   controllerName="ui5.controller.App"
+   xmlns="sap.m"
+   xmlns:mvc="sap.ui.core.mvc"
+  displayBlock="true">
+   <App>
+      <pages>
+         <Page title="{i18n>homePageTitle}">
+            <content>
+               <Panel
+                  headerText="{i18n>helloPanelTitle}">
+                  <content>
+
+                     <Button
+                        text="{i18n>showHelloButtonText}"
+                        press="onShowHello"/>
+                     <Input
+                        value="{/recipient/name}"
+                        description="Hello {/recipient/name}"
+                        valueLiveUpdate="true"
+                        width="60%"/>
+                  </content>
+               </Panel>
+            </content>
+         </Page>
+      </pages>
+   </App>
+</mvc:View>
+
+-- Listing 9
+
+# App Descriptor
+appTitle=Hello World
+appDescription=A simple walkthrough app that explains the most important concepts of SAPUI5
+
+# Hello Panel
+showHelloButtonText=Say Hello
+helloMsg=Hello {0}
+homePageTitle=Walkthrough
+helloPanelTitle=Hello World
+
+
+-- Listing 10
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Walkthrough</title>
+      <script
+         id="sap-ui-bootstrap"
+         src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js"
+         data-sap-ui-theme="sap_bluecrystal"
+         data-sap-ui-libs="sap.m"
+         data-sap-ui-bindingSyntax="complex"
+         data-sap-ui-compatVersion="edge"
+         data-sap-ui-preload="async"
+         data-sap-ui-resourceroots='{
+            "ui5": "./"
+         }' >
+      </script>
+      <script>
+         sap.ui.getCore().attachInit(function () {
+          new sap.m.Shell({
+               app : new sap.ui.core.ComponentContainer({
+                  name : "ui5",
+                  height : "100%"
+               })
+            }).placeAt("content");
+         });
+      </script>
+   </head>
+   <body class="sapUiBody" id="content">
+   </body>
+</html>
+
+
+-- Listing 11
+
+<mvc:View
+	controllerName="ui5.controller.App"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true">
+	<App>
+		<pages>
+			<Page title="{i18n>homePageTitle}">
+				<content>
+					<Panel
+						headerText="{i18n>helloPanelTitle}"
+						class="sapUiResponsiveMargin"
+						width="auto">
+						<content>
+							<Button
+								text="{i18n>showHelloButtonText}"
+								press="onShowHello"
+								class="sapUiSmallMarginEnd"/>
+							<Input
+								value="{/recipient/name}"
+								valueLiveUpdate="true"
+								width="60%"/>
+							<Text
+								text="Hello {/recipient/name}"
+								class="sapUiSmallMargin sapThemeHighlight-asColor"/>
+
+						</content>
+					</Panel>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
+
+
+-- Listing 13
+
+.myAppDemoWT .myCustomButton.sapMBtn {
+  margin-right: 0.125rem
+}
+
+html[dir="rtl"] .myAppDemoWT .myCustomButton.sapMBtn {
+  margin-left: 0.125rem;
+  margin-right: 0 
+}
+.myAppDemoWT .myCustomText {
+  font-weight: bold;
+}
+
+.panelHeader {
+  background-color: magenta;
+}
+
+
+-- Listing 13
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+	"_version": "1.1.0",
+	"id": "ui5",
+	"type": "application",
+	"i18n": "i18n/i18n.properties",
+	"title": "{{appTitle}}",
+	"description": "{{appDescription}}",
+	"applicationVersion": {
+	  "version": "1.0.0"
+	}
+  },
+  "sap.ui": {
+	"_version": "1.1.0",
+	"technology": "UI5",
+	"deviceTypes": {
+	  "desktop": true,
+	  "tablet": true,
+	  "phone": true
+	},
+	"supportedThemes": [
+	  "sap_bluecrystal"
+	]
+  },
+  "sap.ui5": {
+	"_version": "1.1.0",
+	"rootView": "ui5.view.App",
+	"dependencies": {
+	  "minUI5Version": "1.30",
+	  "libs": {
+		"sap.m": {}
+	  }
+	},
+	"models": {
+	  "i18n": {
+		"type": "sap.ui.model.resource.ResourceModel",
+		"settings": {
+		  "bundleName": "ui5.i18n.i18n"
+		}
+	  }
+	},
+	"resources": {
+	  "css": [
+		{
+		  "uri": "css/styles.css"
+		}
+	  ]
+	}
+  }
+}
+
+-- Listing 14
+
+<mvc:View
+   controllerName="ui5.controller.App"
+   xmlns="sap.m"
+   xmlns:mvc="sap.ui.core.mvc"
+   displayBlock="true">
+   <App class="myAppDemoWT">
+      <pages>
+         <Page title="{i18n>homePageTitle}">
+            <content>
+               <Panel
+                  headerText="{i18n>helloPanelTitle}"
+                  class="sapUiResponsiveMargin panelHeader"
+                  width="auto">
+                  <content>
+                     <Button
+                        text="{i18n>showHelloButtonText}"
+                        press="onShowHello"
+                        class="myCustomButton"/>
+                     <Input
+                        value="{/recipient/name}"
+                        valueLiveUpdate="true"
+                        width="60%"/>
+	       <Text
+                        text="Hello {/recipient/name}"
+                        class ="sapUiSmallMargin sapThemeHighlight-asColor myCustomText"/>
+                  </content>
+               </Panel>
+            </content>
+         </Page>
+      </pages>
+   </App>
+</mvc:View>
+

@@ -1,0 +1,301 @@
+-- Listing 1
+
+<!DOCTYPE html >
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Hello World</title>
+   </head>
+   <body>
+      <p>Hello World</p>
+   </body>
+</html>
+
+
+-- Listing 2
+
+<!DOCTYPE html>
+<html>
+   <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+ 	<title>Hello World</title>
+      <script
+         id="sap-ui-bootstrap"
+         src=" /sap/ui5/1/resources/sap-ui-core.js" 
+         data-sap-ui-theme="sap_bluecrystal"
+         data-sap-ui-libs="sap.m"
+         data-sap-ui-compatVersion="edge"
+         data-sap-ui-preload="async" >
+      </script>
+      <script>
+         sap.ui.getCore().attachInit(function () {
+             alert("UI5 is ready");
+         });
+      </script>
+   </head>
+   <body>
+      <p>Hello World</p>
+   </body>
+</html>
+
+
+-- Listing 3
+
+<!DOCTYPE html >
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Hello World</title>
+      <script
+             id="sap-ui-bootstrap"
+             src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js" 
+             data-sap-ui-theme="sap_bluecrystal"
+             data-sap-ui-libs="sap.m"
+             data-sap-ui-compatVersion="edge"
+             data-sap-ui-preload="async" >
+          </script>
+          <script>
+             sap.ui.getCore().attachInit(function () {
+                 alert("UI5 is ready");
+             });
+      </script>
+
+   </head>
+   <body>
+      <p>Hello World</p>
+   </body>
+</html>
+
+
+-- Listing 4
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Hello World!</title>
+      <script
+         id="sap-ui-bootstrap"
+         src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js "
+         data-sap-ui-theme="sap_bluecrystal"
+         data-sap-ui-libs="sap.m"
+         data-sap-ui-compatVersion="edge"
+         data-sap-ui-preload="async" >
+      </script>
+      <script>
+         sap.ui.getCore().attachInit(function () {
+            new sap.m.Text({
+               text : "Hello World"
+            }).placeAt("content");
+         });
+      </script>
+   </head>
+   <body class="sapUiBody" id="content">
+   </body>
+
+
+-- Listing 5
+
+<mvc:View
+   xmlns="sap.m"
+   xmlns:mvc="sap.ui.core.mvc">
+   <Text text="Hello World"/>
+</mvc:View>
+
+
+-- Listing 6
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Hello World!</title>
+      <script
+         id="sap-ui-bootstrap"
+         src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js "
+         data-sap-ui-theme="sap_bluecrystal"
+         data-sap-ui-libs="sap.m"
+         data-sap-ui-compatVersion="edge"
+         data-sap-ui-preload="async"
+         data-sap-ui-resourceroots='{
+            "ui5": "./"
+         }' >
+      </script>
+      <script>
+         sap.ui.getCore().attachInit(function () {
+            sap.ui.xmlview({
+               viewName : "ui5.view.App"
+            }).placeAt("content");
+         });
+      </script>
+   </head>
+   <body class="sapUiBody" id="content">
+   </body>
+</html>
+
+
+-- Listing 7
+
+<mvc:View
+   controllerName="ui5.controller.App"
+   xmlns="sap.m"
+   xmlns:mvc="sap.ui.core.mvc">
+   <Button
+      text="Say Hello"
+      press="onShowHello"/>
+</mvc:View>
+
+
+-- Listing 8
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+   });
+});
+
+
+-- Listing 9
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+      onShowHello : function () {
+         // show a native JavaScript alert
+         alert("Hello World");
+      }
+   });
+});
+
+
+-- Listing 10
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller",
+   "sap/m/MessageToast"
+], function (Controller, MessageToast) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+      onShowHello : function () {
+         MessageToast.show("Hello World");
+      }
+   });
+});
+
+
+-- Listing 11
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller",
+   "sap/m/MessageToast",
+   "sap/ui/model/json/JSONModel"
+], function (Controller, MessageToast, JSONModel) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+      onInit : function () {
+         // set data model on view
+         var oData = {
+            recipient : {
+               name : "World"
+            }
+         };
+         var oModel = new JSONModel(oData);
+         this.getView().setModel(oModel);
+      },
+      onShowHello : function () {
+         MessageToast.show("Hello World");
+      }
+   });
+});
+
+
+-- Listing 13
+
+<mvc:View
+   controllerName="ui5.controller.App"
+   xmlns="sap.m"
+   xmlns:mvc="sap.ui.core.mvc">
+   <Button
+      text="Say Hello"
+      press="onShowHello"/>
+   <Input
+      value="{/recipient/name}"
+      valueLiveUpdate="true"
+      description="Hello {/recipient/name}"
+      width="20%"/>
+</mvc:View>
+
+
+-- Listing 14
+
+showHelloButtonText=Say Hello
+helloMsg=Hello {0}
+
+
+-- Listing 15
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller",
+   "sap/m/MessageToast",
+   "sap/ui/model/json/JSONModel",
+   "sap/ui/model/resource/ResourceModel"
+], function (Controller, MessageToast, JSONModel, ResourceModel) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+     onInit : function () {
+         // set data model on view
+         var oData = {
+            recipient : {
+               name : "World"
+            }
+         };
+         var oModel = new JSONModel(oData);
+         this.getView().setModel(oModel);
+     // set i18n model on view
+         var i18nModel = new ResourceModel({
+            bundleName: "ui5.i18n.i18n"
+         });
+         this.getView().setModel(i18nModel, "i18n");
+      },
+      onShowHello : function () {
+         // read msg from i18n model
+         var oBundle = this.getView().getModel("i18n").getResourceBundle();
+         var sRecipient = this.getView().getModel().getProperty("/recipient/name");
+         var sMsg = oBundle.getText("helloMsg", [sRecipient]);
+         // show message
+         MessageToast.show(sMsg);
+      }
+   });
+});
+
+
+-- Listing 16
+
+<mvc:View
+   controllerName="ui5.controller.App"
+   xmlns="sap.m"
+   xmlns:mvc="sap.ui.core.mvc">
+   <Button
+      text="{i18n>showHelloButtonText}"
+      press="onShowHello"/>
+   <Input
+      value="{/recipient/name}"
+      description="Hello {/recipient/name}"
+       valueLiveUpdate="true"
+      width="20%"/>
+</mvc:View>
+
+
+-- Listing 17
+
+showHelloButtonText=Dis Bonjour
+helloMsg=Bonjour {0}

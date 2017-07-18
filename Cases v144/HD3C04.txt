@@ -1,0 +1,283 @@
+-- Listing 1
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Databinding</title>
+
+    <script id="sap-ui-bootstrap"
+        type="text/javascript"
+        src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js "
+        data-sap-ui-theme="sap_bluecrystal"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-xx-bindingSyntax="complex"
+        data-sap-ui-resourceroots='{ "ui5": "./" }'></script>
+    <script>
+        sap.ui.getCore().attachInit(function() {
+           new sap.m.Shell("shell",{
+               app : new sap.ui.core.ComponentContainer({
+                  height : "100%",
+                  name : "ui5"
+               })
+           }).placeAt("uiArea");  });
+    </script>
+
+</head>
+<body class="sapUiBody">
+
+    <!-- This is where you place the UI5 button -->
+    <div id="uiArea"></div>
+    
+</body>
+</html>
+
+
+-- Listing 2
+
+
+sap.ui.define([
+   "sap/ui/core/UIComponent",
+], function (UIComponent) {
+   "use strict";
+   return UIComponent.extend("ui5.Component", {
+            metadata : {
+		manifest: "json"
+	},
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+
+      }
+   });
+});
+
+
+
+-- Listing 3
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+		"_version": "1.1.0",
+		"id": "ui5",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "Data Binding",
+		"description": "Data Binding Exercise",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"dataSources": {
+			"helloLocal": {
+			"uri": "model/HelloModel.json",
+			"type": "JSON"
+	  }
+	}
+  },
+  "sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_bluecrystal"
+		]
+  },
+  "sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": "ui5.view.App",
+		"dependencies": {
+			"minUI5Version": "1.30",
+			"libs": {
+			"sap.m": {}
+			}
+		},
+		"models": {
+		}
+  }
+}
+
+
+-- Listing 4
+
+
+<mvc:View controllerName="ui5.controller.App"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+
+		    <StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+ 	                          title="Hello World"
+	                          info="English"  />
+
+		    
+</mvc:View>
+
+
+-- Listing 5
+
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller",
+   "sap/m/MessageToast"
+], function (Controller, MessageToast) {
+   "use strict";
+   return Controller.extend("ui5.controller.App", {
+       doIt : function(oEvent) {
+            MessageToast.show("Pressed: " + oEvent.getSource().getId());
+        }
+   });
+});
+
+
+-- Listing 6
+
+
+{
+   
+    "Language" : "English",
+    "Greeting" : "Hello World!"
+        
+}
+
+
+-- Listing 7
+
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+		"_version": "1.1.0",
+		"id": "ui5",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "Data Binding",
+		"description": "Data Binding Exercise",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"dataSources": {
+			"helloLocal": {
+			"uri": "model/HelloModel.json",
+			"type": "JSON"
+	  }
+	}
+  },
+  "sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_bluecrystal"
+		]
+  },
+  "sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": "ui5.view.App",
+		"dependencies": {
+			"minUI5Version": "1.30",
+			"libs": {
+			"sap.m": {}
+			}
+		},
+		"models": {
+			"hello": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "model/HelloModel.json"
+				}
+		}
+  }
+}
+
+
+-- Listing 8
+
+
+<mvc:View controllerName="ui5.controller.App"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+	
+		<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+			title="{hello>/Greeting}"
+			info="{hello>/Language}"  />
+
+</mvc:View>
+
+
+-- Listing 9
+
+
+{
+    "HelloCollection": [
+        {
+            "Language" : "English",
+            "Greeting" : "Hello World!"
+        },
+        {
+            "Language" : "français",
+            "Greeting" : "Bonjour le monde!"
+        }
+    ]
+} 
+
+
+-- Listing 10
+
+
+<mvc:View controllerName="ui5.controller.App"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+
+    <StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+    	title="{hello>/HelloCollection/0/Greeting}"
+    	info="{hello>/HelloCollection/0/Language}"  />
+
+</mvc:View>
+
+
+-- Listing 11
+
+
+{
+    "HelloCollection": [
+        {
+            "Language" : "English",
+            "Greeting" : "Hello World!",
+            "Variations" : [
+                {
+                    "Language" : "English",
+                    "Greeting" : "Tootles!"
+                },
+                {
+                    "Language" : "English",
+                    "Greeting" : "Yo!"
+                }
+            ]
+        },
+        {
+            "Language" : "français",
+            "Greeting" : "Bonjour le monde!"
+        }
+    ]
+} 
+
+
+-- Listing 12
+
+
+<mvc:View controllerName="ui5.controller.App" height="100%"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+
+   <TileContainer id="caseTiles" height="50%" tiles="{hello>/HelloCollection}">
+	<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+	    title="{hello>Greeting}"
+	    info="{hello>Language}"  />
+   </TileContainer>
+
+
+</mvc:View>
+

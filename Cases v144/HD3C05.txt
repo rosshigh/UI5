@@ -1,0 +1,611 @@
+-- Listing 1
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Routing</title>
+
+    <!-- 1.) Load SAPUI5 (from local server), select theme and control library -->
+    <script id="sap-ui-bootstrap"
+        type="text/javascript"
+        src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_bluecrystal"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-xx-bindingSyntax="complex"
+        data-sap-ui-resourceroots='{ "ui5": "./" }'></script>
+
+    <script>
+        sap.ui.getCore().attachInit(function() {
+           new sap.m.Shell("shell",{
+               app : new sap.ui.core.ComponentContainer({
+                  height : "100%",
+                  name : "ui5"
+               })
+           }).placeAt("uiArea");  });
+    </script>
+
+</head>
+<body class="sapUiBody">
+
+    <!-- This is where you place the UI5 button -->
+    <div id="uiArea"></div>
+    
+</body>
+</html>
+
+
+-- Listing 2
+
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+		"_version": "1.1.0",
+		"id": "ui5",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "Routing",
+		"description": "Routing Exercise",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+  },
+  "sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_bluecrystal"
+		]
+  },
+  "sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": "ui5.view.App",
+		"dependencies": {
+			"minUI5Version": "1.30",
+			"libs": {
+			"sap.m": {}
+			}
+		}
+  }
+}
+
+
+
+-- Listing 3
+
+
+sap.ui.define([
+   "sap/ui/core/UIComponent",
+], function (UIComponent) {
+   "use strict";
+   return UIComponent.extend("ui5.Component", {
+            metadata : {
+		manifest: "json"
+	},
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+
+      }
+   });
+});
+
+
+-- Listing 4
+
+
+<mvc:View
+		xmlns="sap.m"
+		xmlns:mvc="sap.ui.core.mvc"
+		displayBlock="true">
+	<App class="myAppDemoWT" id="app"/>
+</mvc:View>
+
+
+-- Listing 5
+
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="ui5.controller.Master" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Master1">
+		<content>
+		
+		</content>
+	</Page>
+</core:View>
+
+
+
+-- Listing 6
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Master", {
+    
+   });
+});
+
+
+-- Listing 7
+
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+		"_version": "1.1.0",
+		"id": "ui5",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "Routing",
+		"description": "Routing Exercise",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+  },
+  "sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_bluecrystal"
+		]
+  },
+  "sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": "ui5.view.App",
+		"dependencies": {
+			"minUI5Version": "1.30",
+			"libs": {
+				"sap.m": {}
+			}
+		},
+		"models": {
+			"hello": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "model/data.json"
+				}
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "ui5.view",
+				"controlId": "app",
+				"controlAggregation": "pages"
+			},
+			"routes": [
+				{
+					"pattern": "",
+					"name": "Master",
+					"target": "Master"
+				}
+			],
+			"targets": {
+				"Master": {
+					"viewName": "Master"
+				}
+			}
+		}
+	}
+}
+
+
+
+-- Listing 8
+
+
+sap.ui.define([
+   "sap/ui/core/UIComponent",
+], function (UIComponent) {
+   "use strict";
+   return UIComponent.extend("ui5.Component", {
+            metadata : {
+		manifest: "json"
+	},
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+        
+         this.getRouter().initialize();
+
+      }
+   });
+});
+
+
+
+-- Listing 9
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="ui5.controller.Detail1" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Detail 1">
+		<content>
+		</content>
+	</Page>
+</core:View>
+
+
+-- Listing 10
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Detail1", {
+    
+   });
+});
+
+
+-- Listing 11
+
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="ui5.controller.Master" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Master1">
+		<content>
+			<Button text="Go to Detail 1" press="go"/>
+		</content>
+	</Page>
+</core:View>
+
+
+
+-- Listing 12
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Master", {
+		go: function (oEvent) {
+			var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+			oRouter.navTo("Detail1");
+		}
+   });
+});
+
+
+-- Listing 13
+
+	"routes": [
+				{
+					"pattern": "",
+					"name": "Master",
+					"target": "Master"
+				},
+					{
+					"pattern": "Detail1",
+					"name": "Detail1",
+					"target": "Detail1"
+				}
+			],
+			"targets": {
+				"Master": {
+					"viewName": "Master"
+				},
+				"Detail1": {
+					"viewName": "Detail1"
+				}
+			}
+
+
+-- Listing 14
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="ui5.controller.Detail1" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Detail 1"
+	    showNavButton = "true"
+	    navButtonPress = "Back">
+		<content>
+		</content>
+	</Page>
+</core:View>
+
+
+-- Listing 15
+
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Detail1", {
+		
+		Back: function(){
+                                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+		    oRouter.navTo('Master');
+		}
+
+   });
+});
+
+
+
+-- Listing 16
+
+
+<mvc:View
+		xmlns="sap.m"
+		xmlns:mvc="sap.ui.core.mvc"
+		displayBlock="true">
+	<SplitApp class="myAppDemoWT" id="app"/>
+</mvc:View>
+
+
+
+-- Listing 17
+
+
+	"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "ui5.view",
+				"controlId": "app"
+			},
+			"routes": [
+				{
+					"pattern": "",
+					"name": "Master",
+					"target": "Master"
+				},
+					{
+					"pattern": "Detail1",
+					"name": "Detail1",
+					"target": "Detail1"
+				}
+			],
+			"targets": {
+				"Master": {
+					"viewName": "Master",
+					"controlAggregation": "masterPages"
+				},
+				"Detail1": {
+					"viewName": "Detail1",
+					"controlAggregation": "detailPages"
+				}
+			}
+
+
+
+-- Listing 18
+
+
+{
+    "collection" : [
+        {
+            "prop1" : "A",
+            "subcol" : [
+                {
+                    "subProp1" : "One"
+                },
+                {
+                    "subProp1" : "Two"
+                }
+            ]
+        },
+        {
+            "prop1" : "B",
+            "subcol" : [
+                {
+                    "subProp1" : "Three"
+                },
+                {
+                    "subProp1" : "Four"
+                }
+            ]
+        }
+        
+    ]
+}
+
+
+-- Listing 19
+
+
+{
+  "_version": "1.1.0",
+  "sap.app": {
+		"_version": "1.1.0",
+		"id": "ui5",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "Routing",
+		"description": "Routing Exercise",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+  },
+  "sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_bluecrystal"
+		]
+  },
+  "sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": "ui5.view.App",
+		"dependencies": {
+			"minUI5Version": "1.30",
+			"libs": {
+			"sap.m": {}
+			}
+		},
+		"models": {
+			"routing": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "model/data.json"
+				}
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "ui5.view",
+				"controlId": "app"
+			},
+			"routes": [
+				{
+					"pattern": "",
+					"name": "Master",
+					"target": "Master"
+				},
+				{
+					"pattern": "Detail1",
+					"name": "Detail1",
+					"target": "Detail1"
+				}
+			],
+			"targets": {
+				"Master": {
+					"viewName": "Master",
+					"controlAggregation": "masterPages"
+				},
+				"Detail1": {
+					"viewName": "Detail1",
+					"controlAggregation": "detailPages"
+				}
+			}
+		}
+  }
+}
+
+
+-- Listing 20
+
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="ui5.controller.Master" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Master1">
+		<content>
+		    <List 
+                                    headerText="Master List"
+                                    items="{routing>/collection}" >
+			<StandardListItem
+                                                type="Active"
+                                                press="go"
+                                               title="{routing>prop1}" />
+		    </List>
+		</content>
+	</Page>
+</core:View>
+
+
+-- Listing 21
+
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="ui5.controller.Detail1" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Detail 1">
+		<content>
+		    <List 
+                                    headerText="Detail 1 List"
+                                    items="{routing>subcol}" >
+				<StandardListItem
+                                                              type="Active"
+                                                              title="{routing>subProp1}" />
+		    </List>
+		</content>
+	</Page>
+</core:View>
+
+
+-- Listing 22
+
+
+"routes": [
+				{
+					"pattern": "",
+					"name": "Master",
+					"target": "Master"
+				},
+				{
+					"pattern": "Detail1/{item}",
+					"name": "Detail1",
+					"target": "Detail1"
+				}
+			],
+			"targets": {
+				"Master": {
+					"viewName": "Master",
+					"controlAggregation": "masterPages"
+				},
+				"Detail1": {
+					"viewName": "Detail1",
+					"controlAggregation": "detailPages"
+				}
+			}
+
+
+-- Listing 23
+
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Master", {
+		go: function (oEvent) {
+		    var oItem = oEvent.getSource();
+		    var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+		    oRouter.navTo("Detail1", {
+			item: oItem.getBindingContext("routing").getPath().substr(12)
+		    });
+		}
+   });
+});
+
+
+-- Listing 24
+
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Detail1", {
+        onInit: function () {
+	var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+	oRouter.getRoute("Detail1").attachPatternMatched(this._onObjectMatched, this);
+        },
+       _onObjectMatched: function (oEvent) {
+	this.getView().bindElement({
+		path: "/collection/" + oEvent.getParameter("arguments").item,
+		model: "routing"
+	});
+        }
+   });
+});
+
