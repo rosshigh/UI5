@@ -219,6 +219,7 @@ sap.ui.define([
    </App>
 </mvc:View>
 
+
 -- Listing 9
 
 # App Descriptor
@@ -233,6 +234,7 @@ helloPanelTitle=Hello World
 
 
 -- Listing 10
+
 
 <!DOCTYPE html>
 <html>
@@ -305,6 +307,42 @@ helloPanelTitle=Hello World
 </mvc:View>
 
 
+-- Listing 12
+
+<!DOCTYPE html >
+<html>
+   <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <title>Hello World</title>
+        <script
+         id="sap-ui-bootstrap"
+         src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js" 
+         data-sap-ui-theme="sap_belize"
+         data-sap-ui-libs="sap.m"
+         data-sap-ui-compatVersion="edge"
+         data-sap-ui-preload="async"
+                  data-sap-ui-resourceroots='{
+            "ui5": "./"
+         }'> 
+      </script>
+      <script>
+         sap.ui.getCore().attachInit(function () {
+            new sap.m.Shell({
+               app : new sap.ui.core.ComponentContainer({
+                  name : "ui5",
+                  height : "100%"
+               })
+            }).placeAt("content");
+         });
+      </script>
+
+   </head>
+      <body class="sapUiBody" id="content">
+   </body>
+</html>
+
+
 -- Listing 13
 
 .myAppDemoWT .myCustomButton.sapMBtn {
@@ -319,12 +357,27 @@ html[dir="rtl"] .myAppDemoWT .myCustomButton.sapMBtn {
   font-weight: bold;
 }
 
-.panelHeader {
-  background-color: magenta;
+.sapMPanelBGTranslucent  {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#d4e4ef+0,86aecc+100;Grey+Gloss */
+    background: #d4e4ef; /* Old browsers */
+    background: -moz-linear-gradient(top, #d4e4ef 0%, #86aecc 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #d4e4ef 0%,#86aecc 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #d4e4ef 0%,#86aecc 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4e4ef', endColorstr='#86aecc',GradientType=0 ); /* IE6-9 */    
 }
 
+.panelHeader {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#d0e4f7+0,73b1e7+24,0a77d5+50,539fe1+79,87bcea+100;Blue+Pipe+%231 */
+    background: #d0e4f7; /* Old browsers */
+    background: -moz-linear-gradient(top, #d0e4f7 0%, #73b1e7 24%, #0a77d5 50%, #539fe1 79%, #87bcea 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #d0e4f7 0%,#73b1e7 24%,#0a77d5 50%,#539fe1 79%,#87bcea 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #d0e4f7 0%,#73b1e7 24%,#0a77d5 50%,#539fe1 79%,#87bcea 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=0 ); /* IE6-9 */
+} 
 
--- Listing 13
+
+-- Listing 14
+
 
 {
   "_version": "1.1.0",
@@ -378,7 +431,9 @@ html[dir="rtl"] .myAppDemoWT .myCustomButton.sapMBtn {
   }
 }
 
--- Listing 14
+
+
+-- Listing 15
 
 <mvc:View
    controllerName="ui5.controller.App"
@@ -412,4 +467,3 @@ html[dir="rtl"] .myAppDemoWT .myCustomButton.sapMBtn {
       </pages>
    </App>
 </mvc:View>
-

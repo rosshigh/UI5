@@ -1,0 +1,227 @@
+-- Listing 1
+
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta charset="UTF-8">
+
+		<title>ImageClassifierWorkshop</title>
+
+		<script id="sap-ui-bootstrap"
+			src="../../resources/sap-ui-core.js"
+			data-sap-ui-libs="sap.m"
+			data-sap-ui-theme="sap_belize"
+			data-sap-ui-compatVersion="edge"
+			data-sap-ui-resourceroots='{"ImageClassifierWorkshop": ""
+                                       ,"sapui5ml":"./"}'>
+		</script>
+
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+		<script>
+			sap.ui.getCore().attachInit(function() {
+				new sap.m.Shell({
+					app: new sap.ui.core.ComponentContainer({
+						height : "100%",
+						name : "ImageClassifierWorkshop"
+					})
+				}).placeAt("content");
+			});
+		</script>
+	</head>
+
+	<body class="sapUiBody" id="content">
+	</body>
+
+</html>
+
+
+-- Listing 2
+
+{
+	"welcomeFile": "/webapp/index.html",
+	"routes": [{
+			"path": "/resources",
+			"target": {
+				"type": "service",
+				"name": "sapui5",
+				"entryPath": "/resources"
+			},
+			"description": "SAPUI5 Resources"
+		}, {
+			"path": "/test-resources",
+			"target": {
+				"type": "service",
+				"name": "sapui5",
+				"entryPath": "/test-resources"
+			},
+			"description": "SAPUI5 Test Resources"
+		}, {
+			"path": "/ml",
+			"target": {
+				"type": "destination",
+				"name": "sapui5ml-api"
+			},
+			"description": "ML API destination"
+		}
+
+	],
+	"sendWelcomeFileRedirect": true,
+	"headerWhiteList": [
+		"APIKey"
+	]
+}
+
+
+-- Listing 3
+
+{
+	"url" : "/ml/imageclassifier/inference_sync",
+	"APIKey":"<<<<< COPY YOUR API KEY >>>>>"
+}
+
+
+-- Listing 4
+
+"images": {
+    "type": "sap.ui.model.json.JSONModel",
+    "preload": true,
+    "uri": "model/image-api.json"
+  }
+
+
+-- Listing 5
+
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:table="sap.ui.table" xmlns:unified="sap.ui.unified" xmlns="sap.m"
+	xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" controllerName="sapui5ml.controller.View1"
+	displayBlock="true">
+	<App>
+		<pages>
+			<Page title="Image Classification">
+				<content>
+					<Carousel pages="{images>/result-imageclassifier}" width="100%" visible="{= typeof ${images>/resultVisible-imageclassifier} !== 'undefined'}">
+						<pages>
+							<VBox width="100%" direction="Column" alignItems="Center">
+								<Image class="sapUiLargeMargin" src="{images>fileURL}"/>
+								<Label text="File name: {images>name}" class="sapUiLargeMargin"></Label>
+								<table:Table rows="{images>results}" enableBusyIndicator="true" selectionMode="Single" visibleRowCount="5">
+									<table:columns>
+										<table:Column sortProperty="label" filterProperty="label">
+											<Label text="Label"/>
+											<table:template>
+												<Link text="{images>label}" href="https://www.google.fr/search?q={label}&amp;newwindow=1&amp;tbm=isch" target="search"/>
+											</table:template>
+										</table:Column>
+										<table:Column sortProperty="score" filterProperty="score">
+											<Label text="Score"/>
+											<table:template>
+												<Text text="{images>score}"/>
+											</table:template>
+										</table:Column>
+									</table:columns>
+								</table:Table>
+							</VBox>
+						</pages>
+					</Carousel>
+				</content>
+				<footer>
+					<Toolbar width="100%">
+						<content>
+							<unified:FileUploader buttonOnly="true" buttonText="Upload Picture" sameFilenameAllowed="true" multiple="false" fileType="zip,png,jpeg,jpg,bmp,tiff,tif" mimeType="application/x-zip-compressed,application/zip,application/octet-stream,image/png,image/jpg,image/jpeg,image/bmp,image/tiff" typeMissmatch="fileTypeMissmatch" change="fileUploadChange" uploadStart="fileUploadStart" uploadComplete="fileUploadComplete" name="files" uploadUrl="{images>/url}" useMultipart="true" sendXHR="true" uploadOnChange="true">
+								<unified:headerParameters>
+									<unified:FileUploaderParameter name="APIKey" value="{images>/APIKey}"/>
+									<unified:FileUploaderParameter name="Accept" value="application/json"/>
+								</unified:headerParameters>
+							</unified:FileUploader>
+						</content>
+					</Toolbar>
+				</footer>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
+
+
+
+-- Listing 6
+
+sap.ui.define([
+	"sap/ui/core/mvc/Controller",
+	"sap/m/MessageToast"
+], function(Controller, MessageToast) {
+	"use strict";
+
+	var defaultFileSrcUrl = "/resources/sap/ui/documentation/sdk/images/logo_ui5.png";
+
+	return Controller.extend("sapui5ml.controller.View1", {
+		fileTypeMissmatch: function(oControlEvent) {
+			MessageToast.show("Wrong file type!");
+		},
+		fileUploadChange: function(oControlEvent) {
+			// start the busy indicator
+			var oBusyIndicator = new sap.m.BusyDialog();
+			oBusyIndicator.open();
+
+			// init the src file, name & url
+			this.srcFileURL = null;
+			this.srcFileName = null;
+			this.srcFile = null;
+
+			// keep a reference of the uploaded file name and create a url out of that when this is an image
+			this.srcFile = oControlEvent.getParameters().files[0];
+			this.srcFileName = this.srcFile.name;
+			if (this.srcFile.type.match("image.*")) {
+				this.srcFileURL = URL.createObjectURL(this.srcFile);
+			}
+			// keep a reference in the view to close it later
+			this.oBusyIndicator = oBusyIndicator;
+		},
+		fileUploadComplete: function(oControlEvent) {
+			// get the current view
+			var oView = this.getView();
+
+			var service = "imageclassifier";
+
+			// clear previous results from the model
+			oView.getModel("images").setProperty("/result-" + service, null);
+			oView.getModel("images").setProperty("/resultVisible-" + service, false);
+
+			var srcFileIsImage = this.srcFile.type.match('image.*');
+
+			var processResult = function(oController, data, fileName, url) {
+				// set the image urls to default if part of a zip
+				if (!srcFileIsImage) {
+					for (var i = 0; i < data.predictions.length; i++) {
+						data.predictions[i].name = fileName + "  /  " + data.predictions[i].name;
+						data.predictions[i].fileURL = defaultFileSrcUrl;
+					}
+				} else {
+					data.predictions[0].fileURL = URL.createObjectURL(oController.srcFile);
+				}
+
+				// merge with existing results
+				var result = oController.getView().getModel("images").getProperty("/result-" + service);
+				if (result) {
+					result.push.apply(result, data.predictions);
+				} else {
+					result = data.predictions;
+				}
+				oController.getView().getModel("images").setProperty("/result-" + service, result);
+
+				// display the result table
+				oController.getView().getModel("images").setProperty("/resultVisible-" + service, true);
+			};
+
+			if (oControlEvent.getParameters().status === 200) {
+				// get the response as JSON and process the results
+				processResult(this, JSON.parse(oControlEvent.getParameters().responseRaw), this.srcFile.nam, this.srcFileURL);
+			} else {
+				oView.getModel("images").setProperty("/resultVisible", false);
+				MessageToast.show("Error " + oControlEvent.getParameters().status + " : " + oControlEvent.getParameters().responseRaw);
+			}
+			this.oBusyIndicator.close();
+		}
+	});
+});

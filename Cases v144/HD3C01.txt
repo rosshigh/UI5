@@ -23,11 +23,11 @@
  	<title>Hello World</title>
       <script
          id="sap-ui-bootstrap"
-         src=" /sap/ui5/1/resources/sap-ui-core.js" 
+         src="/sap/ui5/1/resources/sap-ui-core.js" 
          data-sap-ui-theme="sap_bluecrystal"
          data-sap-ui-libs="sap.m"
          data-sap-ui-compatVersion="edge"
-         data-sap-ui-preload="async" >
+         data-sap-ui-preload="async"> 
       </script>
       <script>
          sap.ui.getCore().attachInit(function () {
@@ -96,6 +96,7 @@
    </head>
    <body class="sapUiBody" id="content">
    </body>
+</html>
 
 
 -- Listing 5
@@ -218,7 +219,7 @@ sap.ui.define([
 });
 
 
--- Listing 13
+-- Listing 12
 
 <mvc:View
    controllerName="ui5.controller.App"
@@ -235,13 +236,13 @@ sap.ui.define([
 </mvc:View>
 
 
--- Listing 14
+-- Listing 13
 
 showHelloButtonText=Say Hello
 helloMsg=Hello {0}
 
 
--- Listing 15
+-- Listing 14
 
 sap.ui.define([
    "sap/ui/core/mvc/Controller",
@@ -278,7 +279,7 @@ sap.ui.define([
 });
 
 
--- Listing 16
+-- Listing 15
 
 <mvc:View
    controllerName="ui5.controller.App"
@@ -295,7 +296,7 @@ sap.ui.define([
 </mvc:View>
 
 
--- Listing 17
+-- Listing 16
 
 showHelloButtonText=Dis Bonjour
 helloMsg=Bonjour {0}

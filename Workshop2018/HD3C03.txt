@@ -1,0 +1,201 @@
+-- Listing 1
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>SAPUI5 in 20 Seconds</title>
+
+    <!-- 1.) Load SAPUI5 (from local server), select theme and control library -->
+    <script id="sap-ui-bootstrap"
+        type="text/javascript"
+        src="/sap/ui5/1/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_bluecrystal"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-xx-bindingSyntax="complex"
+        data-sap-ui-resourceroots='{ "ui5": "./" }'></script>
+
+    <script>
+        sap.ui.getCore().attachInit(function() {
+           new sap.m.Shell("shell",{
+               app : new sap.ui.core.ComponentContainer({
+                  height : "100%",
+                  name : "ui5"
+               })
+           }).placeAt("uiArea");  });
+    </script>
+
+</head>
+<body class="sapUiBody">
+
+    <!-- This is where you place the UI5 button -->
+    <div id="uiArea"></div>
+    
+</body>
+</html>
+
+
+-- Listing 2
+
+jQuery.sap.declare("ui5.Component");
+
+sap.ui.core.UIComponent.extend("ui5.Component", {
+	metadata: {
+	},
+	
+	init: function() {
+		
+		//call createContent
+		sap.ui.core.UIComponent.prototype.init.apply(this, arguments);
+		
+	},
+	
+              createContent : function() {
+
+	    // create root view
+	    var oView = sap.ui.view({
+		id : "app",
+		viewName : "ui5.view.App",
+		type : "JS",
+		viewData : { component : this }
+	   });
+
+	    return oView;
+                }
+});
+
+
+-- Listing 3
+
+sap.ui.jsview("ui5.view.App", {
+
+	createContent: function () {
+				
+		// create app
+		this.app = new sap.m.App();
+		
+		// load the master page using an XML view
+		var hello = sap.ui.xmlview("Hello", "ui5.view.Hello");
+
+		this.app.addPage(hello, true);
+		
+		return this.app;
+	}
+});
+
+
+-- Listing 4
+
+<mvc:View controllerName="ui5.controller.Hello"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+
+		    <StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+ 	                          title="Hello World"
+	                          info="English"  />
+
+		    
+</mvc:View>
+
+
+-- Listing 5
+
+sap.ui.controller("ui5.controller.Hello", {
+
+    doIt : function(oEvent) {
+    
+        jQuery.sap.require("sap.m.MessageToast");
+		sap.m.MessageToast.show("Pressed: " + oEvent.getSource().getId());
+		
+    }
+
+});
+
+
+-- Listing 6
+
+{
+   
+    "Language" : "English",
+    "Greeting" : "Hello World!"
+        
+}
+
+
+-- Listing 7
+
+var oModel = new sap.ui.model.json.JSONModel("model/HelloModel.json");
+this.setModel(oModel, "hello");
+
+
+-- Listing 8
+
+<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+	title="{hello>/Greeting}"
+	info="{hello>/Language}"  />
+
+
+-- Listing 9
+
+{
+    "HelloCollection": [
+        {
+            "Language" : "English",
+            "Greeting" : "Hello World!"
+        },
+        {
+            "Language" : "français",
+            "Greeting" : "Bonjour le monde!"
+        }
+    ]
+} 
+
+
+-- Listing 10
+
+<mvc:View controllerName="ui5.controller.Hello"
+	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
+
+    <StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+    	title="{hello>/HelloCollection/0/Greeting}"
+    	info="{hello>/HelloCollection/0/Language}"  />
+
+</mvc:View>
+
+
+-- Listing 11
+
+{
+    "HelloCollection": [
+        {
+            "Language" : "English",
+            "Greeting" : "Hello World!",
+            "Variations" : [
+                {
+                    "Language" : "English",
+                    "Greeting" : "Tootles!"
+                },
+                {
+                    "Language" : "English",
+                    "Greeting" : "Yo!"
+                }
+            ]
+        },
+        {
+            "Language" : "français",
+            "Greeting" : "Bonjour le monde!"
+        }
+    ]
+} 
+
+
+-- Listing 12
+
+<TileContainer id="caseTiles" height="50%" tiles="{hello>/HelloCollection}">
+	<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+	    title="{hello>Greeting}"
+	    info="{hello>Language}"  />
+</TileContainer>
+
+
+
+

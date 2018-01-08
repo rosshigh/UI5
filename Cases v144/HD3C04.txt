@@ -4,15 +4,17 @@
 <html>
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Databinding</title>
+    <title>SAPUI5 in 20 Seconds</title>
 
+    <!-- 1.) Load SAPUI5 (from local server), select theme and control library -->
     <script id="sap-ui-bootstrap"
         type="text/javascript"
-        src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js "
+        src="/sap/ui5/1/resources/sap-ui-core.js"
         data-sap-ui-theme="sap_bluecrystal"
         data-sap-ui-libs="sap.m"
         data-sap-ui-xx-bindingSyntax="complex"
         data-sap-ui-resourceroots='{ "ui5": "./" }'></script>
+
     <script>
         sap.ui.getCore().attachInit(function() {
            new sap.m.Shell("shell",{
@@ -35,77 +37,56 @@
 
 -- Listing 2
 
+jQuery.sap.declare("ui5.Component");
 
-sap.ui.define([
-   "sap/ui/core/UIComponent",
-], function (UIComponent) {
-   "use strict";
-   return UIComponent.extend("ui5.Component", {
-            metadata : {
-		manifest: "json"
+sap.ui.core.UIComponent.extend("ui5.Component", {
+	metadata: {
 	},
-      init : function () {
-         // call the init function of the parent
-         UIComponent.prototype.init.apply(this, arguments);
+	
+	init: function() {
+		
+		//call createContent
+		sap.ui.core.UIComponent.prototype.init.apply(this, arguments);
+		
+	},
+	
+              createContent : function() {
 
-      }
-   });
+	    // create root view
+	    var oView = sap.ui.view({
+		id : "app",
+		viewName : "ui5.view.App",
+		type : "JS",
+		viewData : { component : this }
+	   });
+
+	    return oView;
+                }
 });
-
 
 
 -- Listing 3
 
-{
-  "_version": "1.1.0",
-  "sap.app": {
-		"_version": "1.1.0",
-		"id": "ui5",
-		"type": "application",
-		"i18n": "i18n/i18n.properties",
-		"title": "Data Binding",
-		"description": "Data Binding Exercise",
-		"applicationVersion": {
-			"version": "1.0.0"
-		},
-		"dataSources": {
-			"helloLocal": {
-			"uri": "model/HelloModel.json",
-			"type": "JSON"
-	  }
+sap.ui.jsview("ui5.view.App", {
+
+	createContent: function () {
+				
+		// create app
+		this.app = new sap.m.App();
+		
+		// load the master page using an XML view
+		var hello = sap.ui.xmlview("Hello", "ui5.view.Hello");
+
+		this.app.addPage(hello, true);
+		
+		return this.app;
 	}
-  },
-  "sap.ui": {
-		"_version": "1.1.0",
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		},
-		"supportedThemes": [
-			"sap_bluecrystal"
-		]
-  },
-  "sap.ui5": {
-		"_version": "1.1.0",
-		"rootView": "ui5.view.App",
-		"dependencies": {
-			"minUI5Version": "1.30",
-			"libs": {
-			"sap.m": {}
-			}
-		},
-		"models": {
-		}
-  }
-}
+});
 
 
 -- Listing 4
 
-
-<mvc:View controllerName="ui5.controller.App"
+<mvc:View controllerName="ui5.controller.Hello"
 	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
 
 		    <StandardTile id="tileId" press="doIt" icon="sap-icon://world"
@@ -118,22 +99,19 @@ sap.ui.define([
 
 -- Listing 5
 
+sap.ui.controller("ui5.controller.Hello", {
 
-sap.ui.define([
-   "sap/ui/core/mvc/Controller",
-   "sap/m/MessageToast"
-], function (Controller, MessageToast) {
-   "use strict";
-   return Controller.extend("ui5.controller.App", {
-       doIt : function(oEvent) {
-            MessageToast.show("Pressed: " + oEvent.getSource().getId());
-        }
-   });
+    doIt : function(oEvent) {
+    
+        jQuery.sap.require("sap.m.MessageToast");
+		sap.m.MessageToast.show("Pressed: " + oEvent.getSource().getId());
+		
+    }
+
 });
 
 
 -- Listing 6
-
 
 {
    
@@ -145,72 +123,18 @@ sap.ui.define([
 
 -- Listing 7
 
-
-{
-  "_version": "1.1.0",
-  "sap.app": {
-		"_version": "1.1.0",
-		"id": "ui5",
-		"type": "application",
-		"i18n": "i18n/i18n.properties",
-		"title": "Data Binding",
-		"description": "Data Binding Exercise",
-		"applicationVersion": {
-			"version": "1.0.0"
-		},
-		"dataSources": {
-			"helloLocal": {
-			"uri": "model/HelloModel.json",
-			"type": "JSON"
-	  }
-	}
-  },
-  "sap.ui": {
-		"_version": "1.1.0",
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		},
-		"supportedThemes": [
-			"sap_bluecrystal"
-		]
-  },
-  "sap.ui5": {
-		"_version": "1.1.0",
-		"rootView": "ui5.view.App",
-		"dependencies": {
-			"minUI5Version": "1.30",
-			"libs": {
-			"sap.m": {}
-			}
-		},
-		"models": {
-			"hello": {
-				"type": "sap.ui.model.json.JSONModel",
-				"uri": "model/HelloModel.json"
-				}
-		}
-  }
-}
+var oModel = new sap.ui.model.json.JSONModel("model/HelloModel.json");
+this.setModel(oModel, "hello");
 
 
 -- Listing 8
 
-
-<mvc:View controllerName="ui5.controller.App"
-	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
-	
-		<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
-			title="{hello>/Greeting}"
-			info="{hello>/Language}"  />
-
-</mvc:View>
+<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
+	title="{hello>/Greeting}"
+	info="{hello>/Language}"  />
 
 
 -- Listing 9
-
 
 {
     "HelloCollection": [
@@ -228,8 +152,7 @@ sap.ui.define([
 
 -- Listing 10
 
-
-<mvc:View controllerName="ui5.controller.App"
+<mvc:View controllerName="ui5.controller.Hello"
 	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
 
     <StandardTile id="tileId" press="doIt" icon="sap-icon://world"
@@ -240,7 +163,6 @@ sap.ui.define([
 
 
 -- Listing 11
-
 
 {
     "HelloCollection": [
@@ -268,16 +190,12 @@ sap.ui.define([
 
 -- Listing 12
 
-
-<mvc:View controllerName="ui5.controller.App" height="100%"
-	xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc">
-
-   <TileContainer id="caseTiles" height="50%" tiles="{hello>/HelloCollection}">
+<TileContainer id="caseTiles" height="50%" tiles="{hello>/HelloCollection}">
 	<StandardTile id="tileId" press="doIt" icon="sap-icon://world"
 	    title="{hello>Greeting}"
 	    info="{hello>Language}"  />
-   </TileContainer>
+</TileContainer>
 
 
-</mvc:View>
+
 

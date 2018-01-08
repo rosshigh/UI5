@@ -1,0 +1,127 @@
+-- Listing 1
+
+<ObjectAttribute title="{i18n>headerCity}" text="{Address/City}"/>
+<ObjectAttribute title="{i18n>headerCountry}" text="{Address/CountryText}"/>
+<ObjectAttribute title="{i18n>headerURL}" text="{WebAddress}"/>
+<ObjectAttribute title="{i18n>headerBusinessPartnerRole}" text="{BusinessPartnerRoleText}"/>
+
+
+- Listing 2
+
+headerCity=City
+headerCountry=Country
+headerURL=URL
+headerBusinessPartnerRole=Relationship
+itf1Title=Contacts
+itf2Title=Map
+mapFragmentTitle=Map
+
+
+-- Listing 3
+
+    <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout" xmlns="sap.m">
+	    <l:Grid defaultSpan="L12 M12 S12" id="contactFragment" width="auto">
+		    <l:content>
+			    <f:SimpleForm columnsL="6" columnsM="1" editable="false"
+				layout="ResponsiveGridLayout" maxContainerCols="6" minWidth="1024" title="{i18n>mapFragmentTitle}">
+				    <f:content>
+					    <Label text="Address "/>
+					    <Text text="{Address/Building}"/>
+					    <Text text="{Address/Street}"/>
+					    <Text text="{Address/City}"/>
+					    <Text text="{Address/PostalCode}"/>
+					    <Text text="{Address/CountryText}"/>
+				    </f:content>
+			    </f:SimpleForm>
+		    </l:content>
+	    </l:Grid>
+    </core:FragmentDefinition>
+
+
+-- Listing 4
+
+xmlns:core="sap.ui.core"
+
+
+-- Listing 5
+
+text="{i18n>itf1Title}"
+
+
+-- Listing 6
+
+text="{i18n>itf2Title}"
+
+
+-- Listing 7
+
+<content>
+    <core:Fragment fragmentName="com.sap.ua.view.Map " type="XML" />
+</content>
+
+
+-- Listing 8
+
+,
+{
+  "path": "/GoogleMaps",
+  "target": {
+    "type": "destination",
+    "name": "GoogleMaps",
+    "entryPath": "/"
+  },
+  "description": "Google Maps API"
+}
+
+
+-- Listing 9
+
+<f:SimpleForm columnsL="2" columnsM="2" editable="false" layout="ResponsiveGridLayout" maxContainerCols="2" minWidth="1024"
+	title="{i18n>mapFragmentTitle}">
+	<f:content>
+		<core:Title text="{i18n>mapAddressTitle} "/>
+		<Label text="{i18n>mapStreet}"/>
+		<Text text="{Address/Building} {Address/Street}"/>
+		<Label text="{i18n>mapCity}"/>
+		<Text text="{Address/City}"/>
+		<Label text="{i18n>mapCountry}"/>
+		<Text text="{Address/CountryText}"/>
+		<Label text="{i18n>mapZip}"/>
+		<Text text="{Address/PostalCode}"/>
+		<core:Title text=" "/>
+		<Image src="{ parts: [ 'Address/Building', 'Address/Street', 'Address/PostalCode', 'Address/City' ], formatter: '.formatter.formatMapUrl' }"
+		alt="{i18n>mapAltText}"/>
+	</f:content>
+</f:SimpleForm>
+
+
+
+-- Listing 10
+
+#~~~ Map Fragment ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+mapAddressTitle=Address
+mapStreet=Street
+mapCity=City
+mapCountry=Country
+mapZip=Zipcode
+mapAltText=Map of location
+
+
+-- Listing 11
+
+    /**
+      * Formats an address to a static google maps image
+      * @public
+      * @param {string} sBuilding the building number
+      * @param {string} sStreet the street
+      * @param {string} sZIP the postal code
+      * @param {string} sCity the city
+      * @returns {string} sValue a google maps URL that can be bound to an image
+      */
+    formatMapUrl: function(sBuilding, sStreet, sZIP, sCity) {
+      return "/GoogleMaps/staticmap?zoom=16&size=400x400&markers="
+        + jQuery.sap.encodeURL(sBuilding +" "+ sStreet + ", " + sZIP +  " " + sCity );
+    }
+
+

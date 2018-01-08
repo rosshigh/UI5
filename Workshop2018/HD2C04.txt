@@ -1,0 +1,335 @@
+-- Listing 1
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="UTF-8">
+  
+  <title>UA SAPUI5 Skills App</title>
+
+  <script id="sap-ui-bootstrap" 
+  	    src=" /sap/ui5/1/resources/sap-ui-core.js"
+          data-sap-ui-theme="sap_bluecrystal" 
+          data-sap-ui-libs="sap.m" 
+          data-sap-ui-resourceroots='{
+		       "routing": "./"
+           }'>
+  </script>
+
+  <script>
+    // now create a new, reusable component called ui5 (like our namespace)
+sap.ui.getCore().attachInit(function() {
+   new sap.m.Shell("shell",{
+       app : new sap.ui.core.ComponentContainer({
+          height : "100%",
+          name : "routing"
+       })
+   }).placeAt("content");  });
+  </script>
+
+</head>
+
+<body class="sapUiBody" id="content">
+</body>
+
+</html>
+
+
+-- Listing 2
+
+{
+    "collection" : [
+        {
+            "prop1" : "A",
+            "subcol" : [
+                {
+                    "subProp1" : "One"
+                },
+                {
+                    "subProp1" : "Two"
+                }
+            ]
+        },
+        {
+            "prop1" : "B",
+            "subcol" : [
+                {
+                    "subProp1" : "Three"
+                },
+                {
+                    "subProp1" : "Four"
+                }
+            ]
+        }
+        
+    ]
+}
+
+
+-- Listing 3
+
+
+jQuery.sap.declare("routing.Component");
+
+sap.ui.core.UIComponent.extend("routing.Component",{
+	metadata: {
+	},
+	
+	init: function() {
+	    
+		jQuery.sap.require("sap.m.routing.RouteMatchedHandler");
+		jQuery.sap.require("sap.ui.core.routing.HashChanger");
+		
+		//call createContent
+		sap.ui.core.UIComponent.prototype.init.apply(this, arguments);
+		
+		this._router = this.getRouter();
+		
+		//initlialize the router
+		this._routeHandler = new sap.m.routing.RouteMatchedHandler(this._router);
+		this._router.initialize();
+		
+	},
+	
+	createContent: function() {
+		
+		var oView = sap.ui.view({
+			id: "app",
+			viewName: "routing.view.App",
+			type: "XML",
+			viewData: {component: this}
+		});
+		
+		var oModel = new sap.ui.model.json.JSONModel("model/data.json");
+		oView.setModel(oModel);
+		
+		return oView;
+		
+	}
+	
+});
+
+
+-- Listing 4
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<SplitApp 
+	    id="idAppControl" />
+</core:View>
+
+
+-- Listing 5
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="routing.view.Master1" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Master1">
+		<content>
+		
+		</content>
+	</Page>
+</core:View>
+
+
+-- Listing 6
+
+sap.ui.controller("routing.view.Master1", {
+
+
+});
+
+
+-- Listing 7
+
+<core:View xmlns:core="sap.ui.core" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" controllerName="routing.view.Detail1" 
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Detail1">
+		<content>
+		</content>
+	</Page>
+</core:View>
+
+
+-- Listing 8
+
+sap.ui.controller("routing.view.Detail1", {
+    
+
+});
+
+
+-- Listing 9
+
+routing: {
+
+	config: {
+		viewType: "XML",
+		viewPath: "routing.view",
+		clearTarget: false,
+		transition: "slide"
+	},
+
+	routes: [
+		{
+			pattern: "",
+			name: "Master1",
+			view: "Master1",
+                                   targetControl: "idAppControl",
+			targetAggregation: "masterPages"
+        }
+    ]
+}
+
+
+-- Listing 10
+
+<List 
+	headerText="Master 1 List"
+	items="{/collection}" >
+	<StandardListItem
+		type="Active"
+		press="handleListItemPress"
+		title="{prop1}" />
+</List>
+
+
+-- Listing 11
+
+onInit: function() {
+	
+	this.router = sap.ui.core.UIComponent.getRouterFor(this);
+},
+
+handleListItemPress: function(){
+
+	this.router.navTo("Detail1", {
+		from: "Master1"
+	});
+  
+}
+
+
+-- Listing 12
+
+routes: [
+	{
+		pattern: "",
+		name: "Master1",
+		view: "Master1",
+		targetControl: "idAppControl",
+		targetAggregation: "masterPages",
+		subroutes : [
+		    {
+		        pattern: "Detail1",
+		        name: "Detail1",
+		        view: "Detail1",
+		        targetAggregation: "detailPages"
+		    }
+		]
+    }
+]
+
+
+-- Listing 13
+
+{
+    "collection" : [
+        {
+            "prop1" : "A",
+            "subcol" : [
+                {
+                    "subProp1" : "One"
+                },
+                {
+                    "subProp1" : "Two"
+                }
+            ]
+        },
+        {
+            "prop1" : "B",
+            "subcol" : [
+                {
+                    "subProp1" : "Three"
+                },
+                {
+                    "subProp1" : "Four"
+                }
+            ]
+        }
+        
+    ]
+}
+
+
+-- Listing 14
+
+handleListItemPress: function(oEvent){
+
+   var entity = oEvent.getSource().getBindingContext().getPath().split("/");
+
+	this.router.navTo("Detail1", {
+		from: "Master1",
+		entity: entity[2]
+	});
+  
+}
+
+
+-- Listing 15
+
+subroutes : [
+    {
+        pattern: "Detail1/{entity}",
+        name: "Detail1",
+        view: "Detail1",
+        targetAggregation: "detailPages"
+    }
+]
+
+
+-- Listing 16
+
+onInit: function() {
+	
+	this.router = sap.ui.core.UIComponent.getRouterFor(this);
+	this.router.attachRoutePatternMatched(this.onRouteMatched, this);
+
+},
+
+onRouteMatched : function(oEvent) {	
+	var oParameters = oEvent.getParameters();
+
+               if (oParameters.name !== "Detail1") { 
+		return;
+	}
+
+	var oView = this.getView();
+
+	var sEntityPath = "/collection/" + oParameters.arguments.entity;
+           var oModel = oView.getModel();
+	var context = new sap.ui.model.Context(oModel , sEntityPath);
+	
+	oView.setBindingContext(context);
+
+}
+
+
+-- Listing 17
+
+<List 
+	headerText="Detail 1 List"
+	items="{subcol}" >
+	<StandardListItem
+		type="Active"
+		press="handleListItemPress"
+		title="{subProp1}" />
+</List>
+

@@ -1,0 +1,449 @@
+-- Listing 1
+
+namespace GBI_825.Customer.data;
+
+@Schema: 'GBI_825'
+context gbi { 
+    
+
+};
+
+
+-- Listing 2
+
+namespace GBI_825.Customer.data;
+
+@Schema: 'GBI_825' 
+context gbi { 
+    
+    @Catalog.tableType: #COLUMN
+       entity CUSTOMERS {
+       key  ID : String(10); 
+            CompanyName : String(35) not null;
+            Address : String(35);
+            City : String(20);
+            Region : String(2);
+            Country : String(2);
+            Postal_code : String(5);
+            SalesOrgID : String(4);
+        };
+
+};
+
+
+-- Listing 3
+
+@Catalog.tableType: #COLUMN    
+    entity SALES_ORDERS { 
+        CreatedAt : LocalDate;
+        CreatedBy : String(20);
+        CustomerID : String(10) not null;
+    key	ID : String(10);
+        GrossAmount : Decimal(17,3);
+        Discount : Decimal(17,3);
+        Status : String(15) default 'New';
+        requiredDate : LocalDate;
+        shipDate : LocalDate;
+};
+
+
+-- Listing 4
+
+import = [
+	{
+		table = "GBI_825.Customer.data::gbi.CUSTOMERS";
+		schema = "GBI_825";
+		file = "GBI_825.Customer.data:customers.csv";
+		header = false;
+	}
+];
+
+
+-- Listing 5
+
+service {
+    "GBI_825.Customer.data::gbi.CUSTOMERS" as "Customers";
+}
+
+
+-- Listing 6
+
+    "GBI_825.Customer.data::gbi.CUSTOMERS" as "Customers"
+        navigates ("CustomersSO" as "CustomerOrders");
+        
+    association "CustomersSO" principal "Customers"("ID") multiplicity "1"
+    dependent "SalesOrders"("CustomerID") multiplicity "*";
+
+
+-- Listing 7
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Customers</title>
+    
+        <!-- 1.) Load SAPUI5 (from local server), select theme and control library -->
+        <script id="sap-ui-bootstrap"
+            type="text/javascript"
+            src="https://openui5.hana.ondemand.com/1.42.6/resources/sap-ui-core.js"
+            data-sap-ui-theme="sap_bluecrystal"
+            data-sap-ui-libs="sap.m"
+            data-sap-ui-xx-bindingSyntax="complex"
+            data-sap-ui-resourceroots='{ "ui5": "./" }'></script>
+    
+        <script>
+            sap.ui.getCore().attachInit(function() {
+               new sap.m.Shell("shell",{
+                   app : new sap.ui.core.ComponentContainer({
+                      height : "100%",
+                      name : "ui5"
+                   })
+               }).placeAt("uiArea");  });
+        </script>
+    
+    </head>
+    <body class="sapUiBody">
+    
+        <!-- This is where you place the UI5 button -->
+        <div id="uiArea"></div>
+        
+    </body>
+</html>
+
+
+-- Listing 8
+
+sap.ui.define([
+   "sap/ui/core/UIComponent"
+], function (UIComponent) {
+   "use strict";
+   return UIComponent.extend("ui5.Component", {
+            metadata : {
+		manifest: "json"
+	},
+      init : function () {
+         // call the init function of the parent
+         UIComponent.prototype.init.apply(this, arguments);
+        
+         this.getRouter().initialize();
+
+      }
+   });
+});
+
+
+-- Listing 9
+
+
+{
+	"_version": "1.1.0",
+	"sap.app": {
+		"_version": "1.1.0",
+		"id": "ui5",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"ach": "CA-UI5-FST",
+		"dataSources": {
+			"employeeRemote": {
+				"uri": "/here/goes/your/serviceUrl/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "2.0",
+					"localUri" : "localService/metadata.xml"
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": ["sap_belize"]
+  	},
+	"sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": "ui5.view.App",
+		"dependencies": {
+			"minUI5Version": "1.30",
+			"libs": {
+				"sap.m": { }
+			}
+		},
+        "models": {
+            
+        },
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "ui5.view",
+				"controlId": "app"
+			},
+			"routes": [
+				{
+					"pattern": "",
+					"name": "Master",
+					"target": "Master"
+				},
+				{
+					"pattern": "Detail/{item}",
+					"name": "Detail",
+					"target": "Detail"
+				}
+			],
+			"targets": {
+				"Master": {
+					"viewName": "Master",
+					"controlAggregation": "masterPages"
+				},
+				"Detail": {
+					"viewName": "Detail",
+					"controlAggregation": "detailPages"
+				}
+			}
+		}
+    }
+}
+
+
+
+-- Listing 10
+
+<mvc:View
+		xmlns="sap.m"
+		xmlns:mvc="sap.ui.core.mvc"
+		displayBlock="true">
+	<SplitApp class="myAppDemoWT" id="app"/>
+</mvc:View>
+
+
+-- Listing 11
+
+"models": {
+    "gbi": {
+		"type": "sap.ui.model.odata.ODataModel",
+		"uri": "http://db1.hana2.ucc.uwm.edu:8002/GBI_825/Customer/services/gbi.xsodata"
+	}
+},
+
+
+-- Listing 12
+
+<mvc:View controllerName="ui5.controller.Master" xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<Page title="Customers">
+        <List 
+    		id="CustomerList"
+    		headerText="Customers"
+    		items="{gbi>/Customers}" >
+    		<StandardListItem
+    			type="Active"
+    			press="handleListItemPress"
+    			title="{gbi>ID}"
+    			description="{gbi>CompanyName}"	 />
+    	</List>
+	</Page>
+</mvc:View>
+
+
+-- Listing 13
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Master", {
+     
+   });
+});
+
+
+-- Listing 14
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Master", {
+     
+	handleListItemPress: function(oEvent){
+	   var oItem = oEvent.getSource();
+	   var entityArray = oItem.getBindingContext("gbi").getPath().split("'");
+	    var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+	    oRouter.navTo("Detail", {
+		    item: entityArray[1]
+	    });
+	}
+
+   });
+});
+
+
+-- Listing 15
+
+
+<mvc:View
+	controllerName="ui5.controller.Detail"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.m">
+	<Page title="Customer Details" >
+	   <l:Grid
+		defaultSpan="L12 M12 S12"
+		width="auto">
+		<l:content>
+			<f:SimpleForm id="idCusotmerForm"
+				minWidth="1024"
+				maxContainerCols="2"
+				editable="false"
+				layout="ResponsiveGridLayout"
+				title="Customer Details"
+				labelSpanL="4"
+				labelSpanM="4"
+				emptySpanL="0"
+				emptySpanM="0"
+				columnsL="2"
+				columnsM="2">
+				<f:content>
+					
+					<core:Title text="Customer" />
+					<Label text="Number" />
+					<Text text="{gbi>ID}" />
+					<Label text="Name" />
+					<Text text="{gbi>CompanyName}" />
+					<Label text="Sales Org" />
+					<Text text="{gbi>SalesOrgID}" />
+                                                                        <core:Title text="Address" />
+					<Label text="Address" />
+					<Text text="{gbi>Address}" />
+					<Label text="City" />
+					<Text text="{gbi>City}" />
+					<Label text="Region" />
+					<Text text="{gbi>Region}" />
+					<Label text="Postal Code" />
+					<Text text="{gbi>Postal_code}" />
+					<Label text="Country" />
+					<Text text="{gbi>Country}" />
+				</f:content>
+			</f:SimpleForm>
+		</l:content>
+	</l:Grid>	
+	</Page>
+</mvc:View>           
+	
+
+-- Listing 16
+
+
+sap.ui.define([
+   "sap/ui/core/mvc/Controller"
+], function (Controller) {
+   "use strict";
+   return Controller.extend("ui5.controller.Detail", {
+      
+		 onInit: function () {
+        	var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+        	oRouter.getRoute("Detail").attachPatternMatched(this._onObjectMatched, this);
+        },
+        
+       _onObjectMatched: function (oEvent) {
+    	    this.getView().bindElement({
+        		path: "/Customers('" + oEvent.getParameter("arguments").item + "')",
+        		model: "gbi"
+    	    });
+        }
+
+   });
+});
+
+
+
+-- Listing 17
+
+
+		</l:content>
+	</l:Grid>	
+	
+	<Table id="idOrdersTable"
+		inset="false"
+		itemPress = "handleTableRowPress"
+		items='{gbi>CustomerOrders}'>
+        <columns>
+            <Column>
+        		<header>
+                    <Text text="ID" />
+                </header>
+            </Column>
+             <Column>
+        		<header>
+                    <Text text="Created At" />
+                </header>
+            </Column>
+            <Column>
+        		<header>
+                    <Text text="Amount" />
+                </header>
+            </Column>
+        </columns>
+	    <items>
+        	<ColumnListItem>
+        		
+        		<Text text="{gbi>ID}"  />
+        		<Text text="{gbi>CreatedAt}"  />
+        		<Text text="{gbi>GrossAmount}"  />
+        		
+        	</ColumnListItem>
+        </items>
+    </Table>
+	</Page>
+</mvc:View>
+
+
+-- Listing 18
+
+
+dateFormatter: function(date){
+    return new Date(date).toLocaleDateString();
+},
+
+currencyFormatter : function(value){
+    var d = ".";
+    var t = ",";
+    var c = 2;
+    var p = "$";
+    c = isNaN(c = Math.abs(c)) ? 2 : c;
+    var s = value < 0 ? "-" : "";
+    var i = parseInt(value = Math.abs(+value || 0).toFixed(2)) + "";
+    var j = (j = i.length) > 3 ? j % 3 : 0;
+    return p + s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(value - i).toFixed(2).slice(2) : "");
+}
+
+
+-- Listing 19
+
+
+<ColumnListItem>
+	<Text text="{gbi>ID}"  />
+	<Text text="{
+			path: 'gbi>CreatedAt',
+			formatter: '.dateFormatter'
+		}"
+	  />
+	<Text text="{
+	    path: 'gbi>GrossAmount',
+	    formatter: '.currencyFormatter'
+	    }"  />
+</ColumnListItem>
+
