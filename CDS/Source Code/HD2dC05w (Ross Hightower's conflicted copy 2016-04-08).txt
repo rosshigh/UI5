@@ -1,0 +1,399 @@
+-- Listing 1
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>GBI Products</title> 
+
+    <script id="sap-ui-bootstrap"
+        type="text/javascript"
+        src="/sap/ui5/1/resources/sap-ui-core.js" 
+        data-sap-ui-theme="sap_bluecrystal"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-xx-bindingSyntax="complex" 
+        data-sap-ui-resourceroots = '{
+            "gbi" : "./"
+        }'></script>
+        
+    <script>
+    
+		new sap.m.Shell("Shell",{
+			app: new sap.ui.core.ComponentContainer({
+				name: 'gbi'
+			})
+		}).placeAt('uiArea');
+				
+		</script>
+
+</head>
+<body class="sapUiBody">
+    <div id="uiArea"></div>
+</body>
+</html>
+
+
+-- Listing 2
+jQuery.sap.declare("gbi.Component");
+
+sap.ui.core.UIComponent.extend("gbi.Component",{
+	
+	metadata: {
+		
+		routing: {
+			
+			config: {
+				viewType: "XML",
+				viewPath: "gbi.view",
+				targetControl: "splitApp",
+				clearTarget: false,
+				transition: "slide"
+			},
+			
+			routes: [
+			        {
+			            pattern : "",
+			            name : "ProductCategories",
+			            view : "Master",
+			            targetAggregation : "masterPages"
+			        },
+			        {
+			            pattern : "ProductCategory/{entity}",
+			            name : "Products",
+			            view : "Products",
+			            targetAggregation : "masterPages",
+			            subroutes : [
+			                {
+    			                pattern : "Products/{entity}",
+    			                name : "Detail",
+    			                view : "Detail",
+    			                targetAggregation : "detailPages"
+			                }
+			            ]
+			        }
+			]
+			
+		}
+		
+	},
+	
+	init: function() {
+		
+		jQuery.sap.require("sap.m.routing.RouteMatchedHandler");
+		jQuery.sap.require("sap.ui.core.routing.HashChanger");
+		
+		//call createContent
+		sap.ui.core.UIComponent.prototype.init.apply(this, arguments);
+		
+		this._router = this.getRouter();
+		
+		//initlialize the router
+		this._routeHandler = new sap.m.routing.RouteMatchedHandler(this._router);
+		this._router.initialize();
+		
+	},
+	
+	createContent: function() {
+		
+		var oView = sap.ui.view({
+			id: "app",
+			viewName: "gbi.view.App",
+			type: "JS",
+			viewData: {component: this}
+		});
+		
+		var oModel = new sap.ui.model.odata.ODataModel("http://hana.ucc.uwm.edu:8004/GBI_002/gbi/services/gbi.xsodata");
+		oView.setModel(oModel,'gbi');
+		
+		return oView;
+		
+	}
+	
+});
+
+
+-- Listing 3
+sap.ui.jsview("gbi.view.App", {
+
+	createContent : function() {
+ 		
+		this.setDisplayBlock(true);
+		
+		return new sap.m.SplitApp("splitApp",{});
+	}
+
+});
+
+
+-- Listing 4
+<mvc:View controllerName="gbi.view.Master" xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<Page title="Orders">
+                  <List 
+		id="ShortProductList"
+		headerText="Product Categories"
+		items="{gbi>/ProductCategories}" >
+		<StandardListItem
+			type="Active"
+			press="handleListItemPress"
+			title="{gbi>ProductCategory}"
+			description="{gbi>Description}"	 />
+	</List>
+
+
+	</Page>
+</mvc:View>
+
+
+-- Listing 5
+sap.ui.controller("gbi.view.Master", {
+    
+   	onInit: function() {
+		
+		this.router = sap.ui.core.UIComponent.getRouterFor(this);
+	},
+	
+	handleListItemPress: function(oItem){
+
+	   var entity = oItem.getBindingContext("gbi").getPath().split("'");
+
+		this.router.navTo("Products", {
+			from: "Master",
+			entity: entity[1]
+		});
+	  
+	}
+
+});
+
+-- Listing 6
+<mvc:View
+	controllerName="gbi.view.Products"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.m">
+	<Page title="Products" 
+	    navButtonPress="handleNavButtonPress"
+	    showNavButton="true">
+    	<List 
+    		id="idProductList"
+    		headerText="Products"
+    		items="{gbi>Products}" >
+    		<StandardListItem
+    			type="Active"
+    			press="handleListItemPress"
+    			title="{gbi>ID}"
+    			description="{gbi>ProductName}"	 />
+    	</List>
+	</Page>
+</mvc:View>
+
+
+-- Listing 7
+sap.ui.controller("gbi.view.Products", {
+  onInit: function() {
+		
+		this.router = sap.ui.core.UIComponent.getRouterFor(this);
+		this.router.attachRoutePatternMatched(this.onRouteMatched, this);
+	
+	},
+	
+	handleNavButtonPress : function(){
+                       this.router.navTo("");
+	},
+
+	onRouteMatched : function(oEvent) {	
+		var oParameters = oEvent.getParameters();
+
+		var oView = this.getView();
+
+		if (oParameters.name !== "Products") { 
+			return;
+		}
+
+		var sEntityPath = "/ProductCategories('" + oParameters.arguments.entity + "')";
+
+		var oModel = oView.getModel('gbi');
+		var oContext = oModel.getContext(sEntityPath);
+		oView.setBindingContext(oContext,'gbi');
+		
+	},
+	
+	handleListItemPress: function(evt){
+
+	   this.showDetail(evt.getParameter("listItem") || evt.getSource());
+	  
+	},
+
+	showDetail : function(oItem) {
+        var entity = oItem.getBindingContext("gbi").getPath().split("'");
+
+		this.router.navTo("Detail", {
+			from: "Products",
+			entity: entity[1]
+		});
+	}
+
+});
+
+
+-- Listing 8
+<mvc:View
+	controllerName="gbi.view.Detail"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.m">
+	<Page title="Products Details" >
+	   <l:Grid
+		defaultSpan="L12 M12 S12"
+		width="auto">
+		<l:content>
+			<f:SimpleForm id="idProductForm"
+				minWidth="1024"
+				maxContainerCols="2"
+				editable="false"
+				layout="ResponsiveGridLayout"
+				title="Product Details"
+				labelSpanL="4"
+				labelSpanM="4"
+				emptySpanL="0"
+				emptySpanM="0"
+				columnsL="2"
+				columnsM="2">
+				<f:content>
+					<core:Title text="" />
+					<core:Title text="" />
+					<Label text="Number" />
+					<Text text="{gbi>ID}" />
+					<Label text="Name" />
+					<Text text="{gbi>ProductName}" />
+					<Label text="Color" />
+					<Text text="{gbi>Color}" />
+                                        <core:Title text="" />
+					<core:Title text="" />
+					<Label text="Price" />
+					<ObjectNumber number = "{gbi>Price}" />
+					<Label text="Internal Price" />
+					<ObjectNumber number = "{gbi>InternalPrice}" />
+				</f:content>
+			</f:SimpleForm>
+		</l:content>
+	</l:Grid>	
+           
+	</Page>
+</mvc:View>
+
+
+-- Listing 9
+sap.ui.controller("gbi.view.Detail", {
+    onInit: function() {
+		
+		this.router = sap.ui.core.UIComponent.getRouterFor(this);
+		this.router.attachRoutePatternMatched(this.onRouteMatched, this);
+	
+	},
+
+	onRouteMatched : function(oEvent) {	
+		var oParameters = oEvent.getParameters();
+		var oView = this.getView();
+
+		// When navigating in the Detail page, update the binding context 
+		if (oParameters.name !== "Detail") { 
+			return;
+		}
+
+		var sEntityPath = "/Products('" + oParameters.arguments.entity + "')";
+	              var oModel = oView.getModel('gbi');
+		var context = new sap.ui.model.Context(oModel , sEntityPath);
+		
+		oView.setBindingContext(context,'gbi');
+
+	}
+	
+});
+
+
+-- Listing 10
+formatCurrency : function(value){
+	    var d = ".";
+	    var t = ",";
+	    var c = 2;
+	    var p = "$";
+	    c = isNaN(c = Math.abs(c)) ? 2 : c;
+	    var s = value < 0 ? "-" : "";
+	    var i = parseInt(value = Math.abs(+value || 0).toFixed(2)) + "";
+	    var j = (j = i.length) > 3 ? j % 3 : 0;
+	    return p + s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(value - i).toFixed(2).slice(2) : "");
+}
+
+-- Listing 11
+<Image src="{ path : 'gbi>ID', formatter: '.imageURL' }" height="150px" width="150px"/>
+
+
+-- Listing 12
+imageURL : function(file){
+	 return "http://hana.ucc.uwm.edu:8004/GBI_002/gbi/Products/images/" + file + ".jpg";
+}
+
+
+-- Listing 13
+<Table id="idProductsTable"
+		inset="false"
+		itemPress = "handleTableRowPress"
+		items='{gbi>Inventory}'>
+        <columns>
+            <Column
+                minScreenWidth="Tablet"
+                demandPopin='true'
+                mergeDuplicates="true">
+        		<header>
+                    <Text text="Product" />
+                </header>
+            </Column>
+            <Column>
+        		<header>
+        		    <Text text="Plant" />
+        		</header>
+        	</Column>
+        	<Column>
+        		<header>
+        		    <Text text="SLoc" />
+        		</header>
+        	</Column>
+        	<Column>
+        		<header>
+        		    <Text text="Quantity" />
+        		</header>
+        	</Column>
+        	<Column>
+        		<header>
+        		    <Text text="Stock Type" />
+        		</header>
+        	</Column>
+        	 
+        </columns>
+	    <items>
+        	<ColumnListItem>
+        		<Text
+        			text="{gbi>ProductID}"  />
+        		<Text 
+        		    text="{gbi>Plant}" />
+        		<Text 
+        		    text="{gbi>SLoc}" />
+        		<ObjectNumber
+        		    number = "{gbi>Quantity}"
+        		    numberUnit = "{gbi>UnitOfMeasure}" />
+        		<Text
+        		    text = "{gbi>StockType}" />
+        	</ColumnListItem>
+        </items>
+    </Table>
+
+
+-- Listing 14
+formatDate : function(oDate){
+	    return new Date(oDate).toDateString();
+}

@@ -1,0 +1,119 @@
+-- Customers Table
+
+@Catalog:
+{ tableType: #COLUMN,
+  index : [ { name: 'nameIdx', order: #ASC, unique: true,
+                      elementNames: [ 'CompanyName' ] } ]
+}
+   entity CUSTOMERS {
+   key ID : Association[1..*] TO SALES.SALES_ORDERS { CustomerID };
+            CompanyName : String(35) not null;
+            Address : AddressType;
+            SalesOrgID : OrgUnitIDType;
+};
+
+
+-- Products Table
+@Catalog:
+{ tableType: #COLUMN,
+  index : [ { name: 'productNameIdx', order: #ASC, unique: true, elementNames: [ 'ProductName' ] } ]
+}
+entity PRODUCTS {
+	key ID : String(10);
+		ProductName : String(40) not null; 
+		ProductCategory : String(3); 
+		Division : String(2);
+		InternalPrice: Decimal(17,3);
+		Price: Decimal(17,3);
+		Color: String(10);
+		ProductGroup: String(20);
+};
+
+
+-- Product Categories Table
+@Catalog.tableType: #COLUMN
+entity PRODUCT_CATEGORIES {
+	key ProductCategory : String(3);
+		Description : String(40); 
+};
+
+
+-- Inventory Table
+@Catalog.tableType: #COLUMN
+entity INVENTORY { 
+	key	ProductID : String(10);
+	key	Plant : String(4);
+	key SLoc : String(4);
+	key StockType : String(1);
+	    Quantity : Integer;
+	    UnitOfMeasure : String(3) default 'EA';
+};
+
+
+
+-- Table Imports
+	{
+		table = "GBI_002.gbi.data::GBI_002.MASTERDATA.CUSTOMERS";
+		schema = "GBI_002";
+		file = "GBI_002.gbi.data:customers.csv";
+		header = false;
+	},
+	
+	{
+		table = "GBI_002.gbi.data::GBI_002.MASTERDATA.PRODUCTS";
+		schema = "GBI_002";
+		file = "GBI_002.gbi.data:products.csv";
+		header = false;
+	},
+	
+        {
+		table = "GBI_002.gbi.data::GBI_002.SALES.SALES_ORDERS";
+		schema = "GBI_002";
+		file = "GBI_002.gbi.data:salesorders.csv";
+		header = false;
+	}, 
+	
+	{
+		table = "GBI_002.gbi.data::GBI_002.SALES.SALES_ORDER_DETAILS";
+		schema = "GBI_002";
+		file = "GBI_002.gbi.data:salesordersdetails.csv";
+		header = false;
+	},
+	
+	{
+		table = "GBI_002.gbi.data::GBI_002.LOGISTICS.INVENTORY";
+		schema = "GBI_002";
+		file = "GBI_002.gbi.data:inventory.csv";
+		header = false;
+	},
+	
+	{
+		table = "GBI_002.gbi.data::GBI_002.MASTERDATA.PRODUCT_CATEGORIES";
+		schema = "GBI_002";
+		file = "GBI_002.gbi.data:productcategory.csv";
+		header = false;
+	}
+
+
+-- ProductSales View
+View ProductSales AS SELECT FROM SALES_ORDER_DETAILS
+{
+    ProductID,
+    sum(Quantity) AS Quantity,
+    sum(Revenue) AS Revenue,
+    sum(Discount) AS Discount
+} GROUP BY ProductID
+  ORDER BY Revenue;
+
+
+-- CustomerSales View
+View SalesByCustomer AS SELECT FROM SALES_ORDERS
+{
+    CustomerID,
+    sum(GrossAmount.Amount) AS GrossAmount,
+    sum(Discount) AS Disocunt,
+    sum(GrossAmount.Amount - Discount) AS Total
+} GROUP BY CustomerID
+  ORDER BY GrossAmount DESC;
+
+

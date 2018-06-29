@@ -1,0 +1,54 @@
+﻿-- Listing 1
+<HBox class="myMap" id="map_canvas" fitContainer="true" justifyContent="Center" alignItems="Center" />
+
+-- Listing 2
+.myMap {  
+    height: 300px !important;  
+    width: 100%  
+}
+
+
+-- Listing 3
+drawMap: function() {
+	if (!this.initialize) {
+		this.initialize = true;
+		this.geocoder = new google.maps.Geocoder();
+	}
+	var address = this.getView().getBindingContext().getProperty("Street") + ", " +
+		this.getView().getBindingContext().getProperty("City") + ", " +
+		this.getView().getBindingContext().getProperty("PostalCode");
+
+	var oHBox = this.getView().byId("map_canvas").getDomRef();
+	this.geocoder.geocode({
+		'address': address
+	}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			mapAll = new google.maps.Map(oHBox, {
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				center: results[0].geometry.location,
+				zoom: 15
+			});
+			var infowindow = new google.maps.InfoWindow();
+			var marker = new google.maps.Marker({
+				map: mapAll,
+				position: results[0].geometry.location
+			});
+			google.maps.event.addListener(marker, 'click', function() {
+				infowindow.setContent(address);
+				infowindow.open(mapAll, this);
+			});
+		}
+	});
+},
+
+onSelectChanged: function(oEvent) {
+	var key = oEvent.getParameters().key;
+	if (key === "mapKey") {
+		this.drawMap();
+	}
+}
+
+-- Listing 4
+if (oIconTabBar.getSelectedKey() !== "mapKey") {
+	this.drawMap();
+}

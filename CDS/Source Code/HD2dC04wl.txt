@@ -1,0 +1,286 @@
+-- Listing 1
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>GBI Customers</title> 
+
+    <script id="sap-ui-bootstrap"
+        type="text/javascript"
+        src="/sap/ui5/1/resources/sap-ui-core.js" 
+        data-sap-ui-theme="sap_bluecrystal"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-xx-bindingSyntax="complex" 
+        data-sap-ui-resourceroots = '{
+            "view": "./view",
+            "gbi" : "./"
+        }'></script>
+        
+    <script>
+    
+		new sap.m.Shell("Shell",{
+			app: new sap.ui.core.ComponentContainer({
+				name: 'gbi'
+			})
+		}).placeAt('uiArea');
+				
+		</script>
+
+</head>
+<body class="sapUiBody">
+    <div id="uiArea"></div>
+</body>
+</html>
+
+-- Listing 2
+jQuery.sap.declare("gbi.Component");
+
+sap.ui.core.UIComponent.extend("gbi.Component",{
+	
+	metadata: {
+		
+		routing: {
+			
+			config: {
+				viewType: "XML",
+				viewPath: "view",
+				targetControl: "splitApp",
+				clearTarget: false,
+				transition: "slide"
+			},
+			
+			routes: [
+			        {
+			            pattern : "",
+			            name : "Customers",
+			            view : "Master",
+			            targetAggregation : "masterPages",
+			            subroutes : [
+			                {
+    			                pattern : "Orders/{entity}",
+    			                name : "Details",
+    			                view : "Details",
+    			                targetAggregation : "detailPages"
+			                }
+			            ]
+			        }
+			]
+			
+		}
+		
+	},
+	
+	init: function() {
+		
+		jQuery.sap.require("sap.m.routing.RouteMatchedHandler");
+		jQuery.sap.require("sap.ui.core.routing.HashChanger");
+		
+		//call createContent
+		sap.ui.core.UIComponent.prototype.init.apply(this, arguments);
+		
+		this._router = this.getRouter();
+		
+		//initlialize the router
+		this._routeHandler = new sap.m.routing.RouteMatchedHandler(this._router);
+		this._router.initialize();
+		
+	},
+	
+	createContent: function() {
+		
+		var oView = sap.ui.view({
+			id: "app",
+			viewName: "view.App",
+			type: "JS",
+			viewData: {component: this}
+		});
+		
+		var oModel = new sap.ui.model.odata.ODataModel("http://hana.ucc.uwm.edu:8004/GBI_002/gbi/services/gbi.xsodata");
+		oView.setModel(oModel,'gbi');
+		
+		return oView;
+		
+	}
+	
+});
+
+
+-- Listing 3
+sap.ui.jsview("view.App", {
+
+	createContent : function() {
+ 		
+		this.setDisplayBlock(true);
+		
+		return new sap.m.SplitApp("splitApp",{});
+	}
+
+});
+
+
+-- Listing 4
+<mvc:View controllerName="view.Master" xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<Page title="Customers">
+<List 
+		id="ShortCustomerList"
+		headerText="Customers"
+		items="{gbi>/Customers}" >
+		<StandardListItem
+			type="Active"
+			press="handleListItemPress"
+			title="{gbi>ID.CustomerID}"
+			description="{gbi>CompanyName}"	 />
+	</List>
+
+	</Page>
+</mvc:View>
+
+
+-- Listing 5
+sap.ui.controller("view.Master", {
+    
+   	onInit: function() {
+		
+		this.router = sap.ui.core.UIComponent.getRouterFor(this);
+	},
+	
+	handleListItemPress: function(evt){
+
+	   this.showDetail(evt.getSource());
+	  
+	},
+
+	showDetail : function(oItem) {
+
+        var entity = oItem.getBindingContext("gbi").getPath().split("'");
+
+		this.router.navTo("Details", {
+			from: "Master",
+			entity: entity[1]
+		});
+	}
+});
+
+
+-- Listing 6
+<mvc:View
+	controllerName="view.Details"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.m">
+	<Page title="Customer Details" >
+	   <l:Grid
+		defaultSpan="L12 M12 S12"
+		width="auto">
+		<l:content>
+			<f:SimpleForm id="idCusotmerForm"
+				minWidth="1024"
+				maxContainerCols="2"
+				editable="false"
+				layout="ResponsiveGridLayout"
+				title="Customer Details"
+				labelSpanL="4"
+				labelSpanM="4"
+				emptySpanL="0"
+				emptySpanM="0"
+				columnsL="2"
+				columnsM="2">
+				<f:content>
+					
+					<core:Title text="Customer" />
+					<Label text="Number" />
+					<Text text="{gbi>ID.CustomerID}" />
+					<Label text="Name" />
+					<Text text="{gbi>CompanyName}" />
+					<Label text="Sales Org" />
+					<Text text="{gbi>SalesOrgID}" />
+                    <core:Title text="Address" />
+					<Label text="Address" />
+					<Text text="{gbi>Address.Address}" />
+					<Label text="City" />
+					<Text text="{gbi>Address.City}" />
+					<Label text="Region" />
+					<Text text="{gbi>Address.Region}" />
+					<Label text="Postal Code" />
+					<Text text="{gbi>Address.Postal_code}" />
+					<Label text="Country" />
+					<Text text="{gbi>Address.Country}" />
+				</f:content>
+			</f:SimpleForm>
+		</l:content>
+	</l:Grid>	
+
+    <Table id="idOrdersTable"
+		inset="false"
+		itemPress = "handleTableRowPress"
+		items='{gbi>Orders}'>
+        <columns>
+            <Column>
+        		<header>
+                    <Text text="ID" />
+                </header>
+            </Column>
+             <Column>
+        		<header>
+                    <Text text="Created At" />
+                </header>
+            </Column>
+            <Column>
+        		<header>
+                    <Text text="Amount" />
+                </header>
+            </Column>
+            <Column>
+        		<header>
+                    <Text text="Currency" />
+                </header>
+            </Column>
+            
+        </columns>
+	    <items>
+        	<ColumnListItem>
+        		
+        		<Text text="{gbi>ID.OrderID}"  />
+        		<Text text="{gbi>CreatedAt}"  />
+        		<Text text="{gbi>GrossAmount.Amount}"  />
+        		<Text text="{gbi>GrossAmount.Currency}"  />
+        		
+        	</ColumnListItem>
+        </items>
+    </Table>
+           
+	</Page>
+</mvc:View>
+           
+
+-- Listing 7
+sap.ui.controller("view.Details", {
+    onInit: function() {
+		
+		this.router = sap.ui.core.UIComponent.getRouterFor(this);
+		this.router.attachRoutePatternMatched(this.onRouteMatched, this);
+	
+	},
+
+	onRouteMatched : function(oEvent) {	
+		var oParameters = oEvent.getParameters();
+
+		var oView = this.getView();
+
+		// When navigating in the Detail page, update the binding context 
+		if (oParameters.name !== "Details") { 
+			return;
+		}
+
+		var sEntityPath = "/Customers('" + oParameters.arguments.entity + "')";
+	    var oModel = oView.getModel('gbi');
+		var context = new sap.ui.model.Context(oModel , sEntityPath);
+		
+		oView.setBindingContext(context,'gbi');
+
+	}
+	
+});

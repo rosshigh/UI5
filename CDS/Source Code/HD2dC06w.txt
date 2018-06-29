@@ -1,0 +1,502 @@
+-- Listing 1
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="UTF-8">
+
+  <title>Customer CRUD App</title>
+  
+  <!-- Bootstrap the SAPUI5 libraries and create the namespaces for the application -->
+  <script id="sap-ui-bootstrap" 
+        type="text/javascript"
+  	    src="/sap/ui5/1/resources/sap-ui-core.js" 
+          data-sap-ui-theme="sap_bluecrystal" 
+          data-sap-ui-libs="sap.m" 
+          data-sap-ui-resourceroots = '{ 
+            "gbi" : "./"
+        }'>
+  </script>
+
+  <!-- Load the component defined in the Component.js file -->
+  <script>
+    new sap.ui.core.ComponentContainer({
+        name: "gbi"
+    }).placeAt("content")
+    
+  </script>
+
+</head>
+
+<body class="sapUiBody" id="content">
+</body>
+
+</html>
+
+
+-- Listing 2
+jQuery.sap.declare("gbi.Component");
+
+sap.ui.core.UIComponent.extend("gbi.Component", {
+
+  createContent : function() {
+
+	// create root view
+	var oView = sap.ui.view({
+		id : "app",
+		viewName : "gbi.view.App",
+		type : "JS",
+		viewData : { component : this }
+	});
+
+	return oView;
+  }
+});
+
+
+-- Listing 3
+sap.ui.jsview("gbi.view.App", {
+	
+	createContent: function (oController) {
+		
+		// to avoid scroll bars on desktop the root view must be set to block display
+		this.setDisplayBlock(true);
+		
+		// create app
+		this.app = new sap.m.App();
+		
+		// load the master page using an XML view
+		var customer = sap.ui.xmlview("Customers", "gbi.view.Customers");
+		this.app.addPage(customer, true);
+		
+		// done
+		return this.app;
+	}
+});
+
+
+-- Listing 4
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:c="sap.ui.commons">
+	<l:Grid
+		defaultSpan="L12 M12 S12"
+		width="auto">
+		<l:content>
+			<f:SimpleForm id="idEditForm"
+				minWidth="1024"
+				maxContainerCols="2"
+				editable="true"
+				layout="ResponsiveGridLayout"
+				title="Customer Information"
+				labelSpanL="2"
+				labelSpanM="2"
+				emptySpanL="4"
+				emptySpanM="4"
+				columnsL="2"
+				columnsM="1"
+				class="editableForm">
+				<f:content>
+				    <core:Title text="Company" />
+				    <Label text="Customer No." />
+					<Text id="idCustomerID" 
+					    text="{edit>ID.CustomerID}" />
+					<Label text="Company Name:" />
+					<Input id="idCompanyName" 
+					    maxLength="35" 
+					    value="{edit>CompanyName}" />
+					<Label text="Sales Org" />
+					<Input id="idSalesOrg" 
+					    maxLength="4" 
+					    value="{edit>SalesOrgID}" />
+					<core:Title text="Address" />
+					<Label text="Address" />
+					<Input id="idAddress" 
+					    maxLength="35" 
+					    value="{edit>Address.Address}" />
+					<Label text="City" />
+					<Input id="idCity" 
+					    maxLength="20" 
+					    value="{edit>Address.City}" />
+					<Label text="Region" />
+					<Input id="idRegion" 
+					    maxLength="2" 
+					    value="{edit>Address.Region}" />
+					<Label text="Postal Code" />
+					<Input id="idPostalCode" 
+					    maxLength="5" 
+					    value="{edit>Address.Postal_code}" />
+					<Label text="Country" />
+					<Input id="idCountry" 
+					    maxLength="5" 
+					    value="{edit>Address.Country}" />					
+				</f:content>
+			</f:SimpleForm>
+		</l:content>
+	</l:Grid>
+</core:FragmentDefinition>										
+
+
+-- Listing 5
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+    <l:Grid
+		defaultSpan="L12 M12 S12"
+		width="auto">
+		<l:content>
+			<f:SimpleForm id="idCustomerForm"
+				minWidth="1024"
+				maxContainerCols="2"
+				editable="false"
+				layout="ResponsiveGridLayout"
+				title="Customer Details"
+				labelSpanL="4"
+				labelSpanM="4"
+				emptySpanL="0"
+				emptySpanM="0"
+				columnsL="2"
+				columnsM="2">
+				<f:content>
+					<core:Title text="Customer" />
+					<Label text="Number" />
+					<Text text="{gbi>ID.CustomerID}" />
+					<Label text="Company" />
+					<Text text="{gbi>CompanyName}" />
+					<Label text="Sales Org" />
+					<Text text="{gbi>SalesOrgID}" />
+					<core:Title text="Address" />
+					<Label text="Address" />
+					<Text text="{gbi>Address.Address}" />
+					<Label text="City" />
+					<Text text="{gbi>Address.City}" />
+					<Label text="Region" />
+					<Text text="{gbi>Address.Region}" />
+					<Label text="Postal Code" />
+					<Text text="{gbi>Address.Postal_code}" />
+					<Label text="Country" />
+					<Text text="{gbi>Address.Country}" />
+				</f:content>
+			</f:SimpleForm>
+		</l:content>
+	</l:Grid>	
+</core:FragmentDefinition>
+
+
+-- Listing 8
+<mvc:View width="100%" controllerName="gbi.view.Customers" xmlns="sap.m"
+	xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:mvc="sap.ui.core.mvc" >
+	<Page title="GBI Customers" id="idPage">
+	    
+	    <VBox width="80%" fitContainer="true" justifyContent="Center">   
+	        
+	    <l:Grid
+		    id="idGrid"
+		    defaultSpan="L10 M12 S12"
+		    width="auto">
+		    <l:content>
+		    </l:content>
+	    </l:Grid>
+    	    
+       	<Table id="idCustomersTable"
+       	      
+			inset="true"
+			items="{gbi>/Customers?$orderby=ID.CustomerID}"
+			itemPress = "handleTableRowPress">
+            <columns>
+                <Column>
+            		<header>
+                        <Text text="Customer No." />
+                    </header>
+                </Column>
+                <Column>
+            		<header>
+                        <Text text="Company" />
+                    </header>
+                </Column>
+                
+                <Column>
+            		<header>
+                        <Text text="Sales Org." />
+                    </header>
+                </Column>
+            </columns>
+		    <items>
+            	<ColumnListItem type="Navigation">
+            		<Text text="{gbi>ID.CustomerID}"  />
+            		<Text text="{gbi>CompanyName}"  />
+            		<Text text="{gbi>SalesOrgID}"  />
+            	</ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+    <footer>
+			<Bar>
+				<contentRight>
+				    <Button id="create" text="Create" press="handleCreatePress" />
+					<Button id="edit" text="Edit" press="handleEditPress" />
+					<Button id="delete" text="Delete" type="Reject" visible="false" press="handleDeletePress" />
+					<Button id="save" text="Save" type="Emphasized" visible="false" press="handleSavePress" />
+					<Button id="cancel" text="Cancel" visible="false" press="handleCancelPress" />
+				</contentRight>
+			</Bar>
+		</footer>
+	</Page>
+</mvc:View>
+
+
+-- Listing 9
+//Load some libraries
+jQuery.sap.require("sap.m.MessageToast");
+jQuery.sap.require("sap.m.MessageBox");
+
+sap.ui.controller("gbi.view.Customers", {
+    
+    onInit : function(){
+        //Create the model and assign it to the view
+        var oModel = new sap.ui.model.odata.ODataModel("http://hana.ucc.uwm.edu:8004/GBI_002/gbi/services/gbi.xsodata");
+		this.getView().setModel(oModel,'gbi');
+        
+        //This model will be used to bind to the edit or create form
+        var jModel = new sap.ui.model.json.JSONModel("");
+		this.getView().setModel(jModel,'edit');
+        
+        //Load the display fragment
+        this._showFormFragment("Display");    
+    },
+    
+    handleTableRowPress : function(oEvent){
+        //When a table row is clicked, get its binding context and set the display form's binding context
+        var context = oEvent.getParameter("listItem").getBindingContext('gbi');
+        this.getView().byId("idCustomerForm").setBindingContext(context,'gbi');
+    },
+    
+   	handleEditPress : function () {
+		//Create a flag so we know that a customer is being edited
+		this.editFlag = true;
+		//Clone the data so we can cancel the changes if necessary
+		this._oCustomer = jQuery.extend({}, this.getView().byId("idCustomerForm").getBindingContext('gbi').getObject());
+		
+		//Add the object ot edit to the edit model
+        this.getView().getModel("edit").setData(this._oCustomer);		
+		
+		//Save the binding context of the display form so we can reset it if necessary
+		this._context =  this.getView().byId("idCustomerForm").getBindingContext('gbi');
+		//Save the binding path so we can perform puts and posts
+		this._sPath = this.getView().byId("idCustomerForm").getBindingContext('gbi').sPath.slice(1);
+		
+		this._toggleButtonsAndView("Edit");
+	},
+
+	handleCancelPress : function () {
+		//Restore the data
+		var oModel = this.getView().getModel('gbi');
+		//Put back the original data
+		oModel.oData[this._sPath] = this._oCustomer;
+		this._toggleButtonsAndView("Display");
+
+	},
+
+	handleSavePress : function () {
+	    //Retrieve the view's model
+        var oModel = this.getView().getModel('gbi');
+        
+	    //Create an object and add the customer properties to it from the form
+	    var oEntry = {};
+	    
+	    //Check whether the customer is being edited or created
+	    oEntry["CompanyName"] = this.byId("idCompanyName").getValue();  
+	    oEntry["SalesOrgID"] = this.byId("idSalesOrg").getValue();
+	    oEntry["Address.Address"] = this.byId("idAddress").getValue();  
+	    oEntry["Address.City"] = this.byId("idCity").getValue();  
+	    oEntry["Address.Region"] = this.byId("idRegion").getValue();  
+	    oEntry["Address.Country"] = this.byId("idCountry").getValue();  
+	    oEntry["Address.Postal_code"] = this.byId("idPostalCode").getValue(); 
+    	    
+	    if(this.editFlag){
+            oEntry["ID.CustomerID"] = this.byId('idCustomerID').getText(); 
+            //Perform a PUT
+            oModel.update('/' + this._sPath, oEntry, null, function(data){
+    		    sap.m.MessageToast.show("Update successful");
+     	    },function(data){
+    		    sap.m.MessageToast.show("Update failed");
+     	    });
+        } else {
+            oEntry["ID.CustomerID"] = 0;  
+            //Perform a POST
+            oModel.create('/Customers', oEntry, null, function(data){
+    		    sap.m.MessageToast.show("Update successful");
+     	    },function(data){
+    		    sap.m.MessageToast.show("Update failed");
+     	    });
+        }
+
+		this._toggleButtonsAndView("Display");
+
+	},
+
+	handleDeletePress : function(){
+	    //Confirm the user wants to delete the customer
+	    var path = this._sPath;
+		sap.m.MessageBox.confirm(
+				"Are you sure you want to delete the customer?",
+				{
+					icon: sap.m.MessageBox.Icon.INFORMATION,
+					title: "Confirm Delete",
+					initialFocus: sap.m.MessageBox.Action.CANCEL,
+					onClose : function(oAction){
+					      if(oAction === "OK"){
+                		        var oView = sap.ui.getCore().byId("Customers");
+                		        var oModel = oView.getModel("gbi");
+                                oModel.remove('/' + path, null, function(){
+                        		    sap.m.MessageToast.show("Delete successful");
+                         	    },function(){
+                        		    sap.m.MessageToast.show("Delete failed");
+                         	    });
+                		    }
+					}
+				}
+		);
+		this._toggleButtonsAndView("Display");	
+	},
+	
+	handleCreatePress : function(){
+	    //Create pressed so set editFlag to false
+	    this.editFlag = false;
+		this._toggleButtonsAndView("Edit");
+	},
+	
+	_formFragments: {},
+
+	_toggleButtonsAndView : function (form) {
+		var oView = this.getView();
+        if(form === "Edit"){
+            oView.byId("edit").setVisible(false);
+		    oView.byId("create").setVisible(false);
+		    oView.byId("save").setVisible(true);
+		    oView.byId("cancel").setVisible(true);
+		    oView.byId("delete").setVisible(true);    
+		    this._showFormFragment("Edit");
+        } if(form === "Create"){
+            oView.byId("edit").setVisible(false);
+		    oView.byId("create").setVisible(false);
+		    oView.byId("save").setVisible(true);
+		    oView.byId("cancel").setVisible(true);
+		    oView.byId("delete").setVisible(false);    
+		    this._showFormFragment("Edit");
+        } if(form === "Display"){
+            oView.byId("edit").setVisible(true);
+		    oView.byId("create").setVisible(true);
+		    oView.byId("save").setVisible(false);
+		    oView.byId("cancel").setVisible(false);
+		    oView.byId("delete").setVisible(false);    
+		    this._showFormFragment("Display");
+        }
+
+	},
+    
+	_getFormFragment: function (sFragmentName) {
+	    //Retrieve the form fragement from the _formFragments object
+	    //If it has been created before it will exist in the object
+		var oFormFragment = this._formFragments[sFragmentName];
+		
+        //If the form fragment has already been created, return it
+		if (oFormFragment) {
+			return oFormFragment;
+		}
+
+        //If it hasn't been created before load it from the file in the view package
+		oFormFragment = sap.ui.xmlfragment(this.getView().getId(), "gbi.view." + sFragmentName);
+
+        //Add it to the _formFragments object and return it
+		return this._formFragments[sFragmentName] = oFormFragment;
+	},
+
+	_showFormFragment : function (sFragmentName) {
+	    //Get a reference to the grid control
+		var oGrid = this.getView().byId("idGrid");
+		//Delete the currrent content
+		oGrid.removeAllContent();
+		//Insert the new fragment
+		oGrid.insertContent(this._getFormFragment(sFragmentName));
+		//If the form is the edit form, set the binding context to the selected item in the table
+		if(sFragmentName === "Edit") {
+		    //Create a context using the edit model
+		    var oContext = new sap.ui.model.Context(this.getView().getModel("edit") , "/");
+		    //Bind the edit form to the edit model
+		    this.getView().byId("idEditForm").setBindingContext(oContext,"edit");
+		}
+	}    
+});
+
+
+-- Listing 10
+context procedures{
+    
+    type custStructure {
+        ID : IDType;
+        CompanyName : String(35);
+        Address : AddressType;
+        SalesOrgID : OrgUnitIDType;
+    };
+    
+    type errorsStructure {
+        HTTP_STATUS_CODE : Integer;
+        ERROR_MESSAGE : String(100);
+        DETAIL : String(100);
+    };
+};
+
+
+-- Listing 11
+    type IDType 
+        {
+            CustomerID : String(10);
+        };
+
+
+-- Listing 12
+PROCEDURE
+    "GBI_002"."GBI_002.gbi.procedures::createCustomer" (
+        IN intab "GBI_002.gbi.data::GBI_002.procedures.custStructure",
+        OUT outtab "GBI_002.gbi.data::GBI_002.procedures.errorsStructure"
+    )
+  LANGUAGE SQLSCRIPT
+  SQL SECURITY INVOKER AS 
+  --DEFAULT SCHEMA <schema>
+  --READS SQL DATA AS
+begin
+declare lv_id string;
+declare lv_companyname string;
+declare lv_address string;
+declare lv_region string;
+declare lv_city string;
+declare lv_country string;
+declare lv_postalcode string;
+declare lv_salesorg string;
+
+select "ID.CustomerID", "CompanyName", "Address.Address", "Address.City", "Address.Country", "Address.Region", "Address.Postal_code", "SalesOrgID"
+into lv_id, lv_companyname, lv_address, lv_city, lv_country, lv_region, lv_postalcode, lv_salesorg from :intab;
+
+if :lv_companyname = '' then
+  outtab = select 500 as http_status_code,
+               'Company Name cannot be null '  as error_message,
+              ' No Way! CompanyName field must not be empty' as detail from dummy;
+else
+
+insert into "GBI_002.gbi.data::GBI_002.MASTERDATA.CUSTOMERS"
+         values ("GBI_002.gbi.data::customerid".NEXTVAL, lv_companyname, lv_address, lv_city, lv_country, lv_region, lv_postalcode, lv_salesorg);
+end if;
+end;
+
+
+-- Listing 12
+"GBI_002.gbi.data::GBI_002.MASTERDATA.CUSTOMERS" as "Customers"
+        navigates ("CustomerOrders" as "Orders")
+        create using "GBI_002.gbi.procedures::createCustomer";

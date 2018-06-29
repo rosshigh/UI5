@@ -1,0 +1,53 @@
+service {
+
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.CUSTOMERS" as "Customers"
+        navigates ("CustomerOrders" as "Orders");
+    
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.SALES_ORGS" as "SalesOrg" 
+        navigates ("SOrg_Customers" as "SOrgCustomers");
+    
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.PRODUCTS" as "Products"
+        navigates ("ProductInventory" as "Inventory");
+        
+    "GBI_002.gbi.data::GBI_002.LOGISTICS.INVENTORY" as "Inventory";
+
+    "GBI_002.gbi.data::GBI_002.SALES.SALES_ORDERS" as "SalesOrders"
+        navigates ("OrderDetails" as "Details", "CustomerSalesNav" as "CustomerSales");
+    
+    "GBI_002.gbi.data::GBI_002.SALES.SALES_ORDER_DETAILS" as "SalesOrdersDetails";
+    
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.PRODUCT_CATEGORIES" as "ProductCategories"
+        navigates ("CategoriesProducts" as "Products");
+
+    "GBI_002.gbi.data::GBI_002.SALES.SalesByCustomer" as "SalesByCustomer"  
+        key generate local "GenID";
+        
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.CustomerSales" as "CustomerSales"  
+        key generate local "GenID";
+
+    "GBI_002.gbi.data::GBI_002.SALES.ProductSales" as "ProductSales"  key ("ProductID");
+
+    "GBI_002.gbi.data::GBI_002.LOGISTICS.InventoryQuantity" as "InventoryQuantity"  key generate local "GenID";
+
+    "GBI_002.gbi.data::GBI_002.SALES.SALES_ORDERS" as "SalesRevenue" key generate local "GenID"
+        aggregates always (SUM of "GrossAmount.Amount");
+    
+    association "CustomerOrders" principal "Customers"("ID.CustomerID") multiplicity "1"
+    dependent "SalesOrders"("CustomerID") multiplicity "*";
+    
+    association "OrderDetails" principal "SalesOrders"("ID.OrderID") multiplicity "1"
+    dependent "SalesOrdersDetails"("OrderID") multiplicity "*";
+
+    association "ProductInventory" principal "Products"("ID") multiplicity "1"
+    dependent "Inventory"("ProductID") multiplicity "*";
+    
+    association "CategoriesProducts" principal "ProductCategories"("ProductCategory") multiplicity "1"
+    dependent "Products"("ProductCategory") multiplicity "*";
+
+    association "SOrg_Customers" principal "SalesOrg"("ID") multiplicity "1"
+    dependent "Customers"("SalesOrgID") multiplicity "*";
+    
+    association "CustomerSalesNav" principal "SalesOrders"("CustomerID") multiplicity "*"
+    dependent "Customers"("ID.CustomerID") multiplicity "1";
+
+}

@@ -1,0 +1,43 @@
+-- Listing 1
+service {
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.CUSTOMERS" as "Customers";
+}
+
+
+-- Listing 2
+service {
+
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.CUSTOMERS" as "Customers";
+    "GBI_002.gbi.data::GBI_002.MASTERDATA.SALES_ORGS" as "SalesOrg" 
+          navigates ("SOrg_Customers" as "SOrgCustomers");
+   
+    association "SOrg_Customers" principal "SalesOrg"("ID") multiplicity "1"
+    dependent "Customers"("SalesOrgID") multiplicity "*";
+
+} 
+
+
+-- Listing 3
+View ProductSales AS SELECT FROM SALES_ORDER_DETAILS
+{
+    ProductID,
+    sum(Quantity) AS Quantity,
+    sum(Revenue) AS Revenue,
+    sum(Discount) AS Discount
+} GROUP BY ProductID
+  ORDER BY Revenue;
+
+
+-- Listing 4
+"GBI_002.gbi.data::GBI_002.SALES.ProductSales" as "ProductSales"  key ("ProductID");
+
+
+-- Listing 5
+"GBI_002.gbi.data::GBI_002.SALES.SalesByCustomer" as "SalesByCustomer"  
+        key generate local "GenID";
+
+
+-- Listing 6
+"GBI_002.gbi.data::GBI_002.SALES.SALES_ORDERS" as "SalesRevenue" 
+        key generate local "GenID"
+        aggregates always (SUM of "GrossAmount.Amount");
